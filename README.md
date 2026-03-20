@@ -1,236 +1,236 @@
 # gstack
 
-Hi, I'm [Garry Tan](https://x.com/garrytan). I'm President & CEO of [Y Combinator](https://www.ycombinator.com/), where I've worked with thousands of startups including Coinbase, Instacart, and Rippling when the founders were just one or two people in a garage — companies now worth tens of billions of dollars. Before YC, I designed the Palantir logo and was one of the first eng manager/PM/designers there. I cofounded Posterous, a blog platform we sold to Twitter. I built Bookface, YC's internal social network, back in 2013. I've been building products as a designer, PM, and eng manager for a long time.
+Xin chào, tôi là [Garry Tan](https://x.com/garrytan). Tôi là Chủ tịch & CEO của [Y Combinator](https://www.ycombinator.com/), nơi tôi đã làm việc với hàng nghìn startup bao gồm Coinbase, Instacart và Rippling khi những người sáng lập chỉ là một hoặc hai người trong một nhà để xe — những công ty nay có giá trị hàng chục tỷ đô la. Trước YC, tôi đã thiết kế logo Palantir và là một trong những eng manager/PM/designer đầu tiên ở đó. Tôi đồng sáng lập Posterous, một nền tảng blog mà chúng tôi đã bán cho Twitter. Tôi đã xây dựng Bookface, mạng xã hội nội bộ của YC, vào năm 2013. Tôi đã xây dựng sản phẩm với tư cách là designer, PM và eng manager trong một thời gian dài.
 
-And right now I am in the middle of something that feels like a new era entirely.
+Và ngay lúc này tôi đang ở giữa một điều gì đó cảm giác như một kỷ nguyên hoàn toàn mới.
 
-In the last 60 days I have written **over 600,000 lines of production code** — 35% tests — and I am doing **10,000 to 20,000 usable lines of code per day** as a part-time part of my day while doing all my duties as CEO of YC. That is not a typo. My last `/retro` (developer stats from the last 7 days) across 3 projects: **140,751 lines added, 362 commits, ~115k net LOC**. The models are getting dramatically better every week. We are at the dawn of something real — one person shipping at a scale that used to require a team of twenty.
+Trong 60 ngày qua, tôi đã viết **hơn 600.000 dòng code production** — 35% là test — và tôi đang làm **10.000 đến 20.000 dòng code có thể sử dụng mỗi ngày** như một phần bán thời gian trong ngày của mình trong khi thực hiện tất cả nhiệm vụ của CEO YC. Đó không phải lỗi đánh máy. `/retro` cuối cùng của tôi (thống kê developer trong 7 ngày qua) trên 3 dự án: **140.751 dòng được thêm, 362 commit, ~115k net LOC**. Các mô hình đang tốt hơn đáng kể mỗi tuần. Chúng ta đang ở buổi bình minh của điều gì đó thực sự — một người ship ở quy mô mà trước đây cần một đội hai mươi người.
 
-**2026 — 1,237 contributions and counting:**
+**2026 — 1.237 đóng góp và tiếp tục:**
 
 ![GitHub contributions 2026 — 1,237 contributions, massive acceleration in Jan-Mar](docs/images/github-2026.png)
 
-**2013 — when I built Bookface at YC (772 contributions):**
+**2013 — khi tôi xây dựng Bookface tại YC (772 đóng góp):**
 
 ![GitHub contributions 2013 — 772 contributions building Bookface at YC](docs/images/github-2013.png)
 
-Same person. Different era. The difference is the tooling.
+Cùng một người. Kỷ nguyên khác. Sự khác biệt là công cụ.
 
-**gstack is how I do it.** It is my open source software factory. It turns Claude Code into a virtual engineering team you actually manage — a CEO who rethinks the product, an eng manager who locks the architecture, a designer who catches AI slop, a paranoid reviewer who finds production bugs, a QA lead who opens a real browser and clicks through your app, and a release engineer who ships the PR. Fifteen specialists and six power tools, all as slash commands, all Markdown, **all free, MIT license, available right now.**
+**gstack là cách tôi làm điều đó.** Đây là nhà máy phần mềm mã nguồn mở của tôi. Nó biến Claude Code thành một đội kỹ thuật ảo mà bạn thực sự quản lý — một CEO suy nghĩ lại về sản phẩm, một eng manager khóa kiến trúc, một designer phát hiện AI slop, một reviewer cẩn thận tìm lỗi production, một QA lead mở browser thực và click qua ứng dụng của bạn, và một release engineer ship PR. Mười lăm chuyên gia và sáu công cụ mạnh mẽ, tất cả là slash command, tất cả là Markdown, **tất cả miễn phí, MIT license, có sẵn ngay bây giờ.**
 
-I am learning how to get to the edge of what agentic systems can do as of March 2026, and this is my live experiment. I am sharing it because I want the whole world on this journey with me.
+Tôi đang học cách đến giới hạn của những gì các hệ thống agentic có thể làm vào tháng 3 năm 2026, và đây là thí nghiệm trực tiếp của tôi. Tôi chia sẻ nó vì tôi muốn cả thế giới cùng đồng hành với tôi.
 
-Fork it. Improve it. Make it yours. Don't player hate, appreciate.
+Fork nó. Cải thiện nó. Làm cho nó của bạn. Đừng ganh tị, hãy trân trọng.
 
-**Who this is for:**
-- **Founders and CEOs** — especially technical ones who still want to ship. This is how you build like a team of twenty.
-- **First-time Claude Code users** — gstack is the best way to start. Structured roles instead of a blank prompt.
-- **Tech leads and staff engineers** — bring rigorous review, QA, and release automation to every PR
+**Dành cho ai:**
+- **Người sáng lập và CEO** — đặc biệt là những người kỹ thuật vẫn muốn ship. Đây là cách bạn xây dựng như một đội hai mươi người.
+- **Người dùng Claude Code lần đầu** — gstack là cách tốt nhất để bắt đầu. Các vai trò có cấu trúc thay vì một prompt trống.
+- **Tech lead và staff engineer** — mang đến review nghiêm ngặt, QA và tự động hóa release cho mọi PR
 
-## Quick start: your first 10 minutes
+## Bắt đầu nhanh: 10 phút đầu tiên của bạn
 
-1. Install gstack (30 seconds — see below)
-2. Run `/office-hours` — describe what you're building. It will reframe the problem before you write a line of code.
-3. Run `/plan-ceo-review` on any feature idea
-4. Run `/review` on any branch with changes
-5. Run `/qa` on your staging URL
-6. Stop there. You'll know if this is for you.
+1. Cài đặt gstack (30 giây — xem bên dưới)
+2. Chạy `/office-hours` — mô tả những gì bạn đang xây dựng. Nó sẽ tái định khung vấn đề trước khi bạn viết một dòng code.
+3. Chạy `/plan-ceo-review` trên bất kỳ ý tưởng tính năng nào
+4. Chạy `/review` trên bất kỳ nhánh nào có thay đổi
+5. Chạy `/qa` trên staging URL của bạn
+6. Dừng ở đó. Bạn sẽ biết liệu điều này có phù hợp với bạn không.
 
-Expect first useful run in under 5 minutes on any repo with tests already set up.
+Mong đợi lần chạy hữu ích đầu tiên trong vòng dưới 5 phút trên bất kỳ repo nào đã có test.
 
-**If you only read one more section, read this one.**
+**Nếu bạn chỉ đọc thêm một phần, hãy đọc phần này.**
 
-## Install — takes 30 seconds
+## Cài đặt — mất 30 giây
 
-**Requirements:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Git](https://git-scm.com/), [Bun](https://bun.sh/) v1.0+
+**Yêu cầu:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Git](https://git-scm.com/), [Bun](https://bun.sh/) v1.0+
 
-### Step 1: Install on your machine
+### Bước 1: Cài đặt trên máy của bạn
 
-Open Claude Code and paste this. Claude does the rest.
+Mở Claude Code và dán vào đây. Claude sẽ làm phần còn lại.
 
-> Install gstack: run **`git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`** then add a "gstack" section to CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade. Then ask the user if they also want to add gstack to the current project so teammates get it.
+> Cài đặt gstack: chạy **`git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`** sau đó thêm phần "gstack" vào CLAUDE.md nói rằng hãy dùng skill /browse từ gstack cho tất cả duyệt web, không bao giờ dùng mcp\_\_claude-in-chrome\_\_\* tools, và liệt kê các skill có sẵn: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade. Sau đó hỏi người dùng có muốn thêm gstack vào dự án hiện tại để đồng nghiệp cũng có không.
 
-### Step 2: Add to your repo so teammates get it (optional)
+### Bước 2: Thêm vào repo của bạn để đồng nghiệp cũng có (tùy chọn)
 
-> Add gstack to this project: run **`cp -Rf ~/.claude/skills/gstack .claude/skills/gstack && rm -rf .claude/skills/gstack/.git && cd .claude/skills/gstack && ./setup`** then add a "gstack" section to this project's CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade, and tells Claude that if gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to build the binary and register skills.
+> Thêm gstack vào dự án này: chạy **`cp -Rf ~/.claude/skills/gstack .claude/skills/gstack && rm -rf .claude/skills/gstack/.git && cd .claude/skills/gstack && ./setup`** sau đó thêm phần "gstack" vào CLAUDE.md của dự án này nói rằng hãy dùng skill /browse từ gstack cho tất cả duyệt web, không bao giờ dùng mcp\_\_claude-in-chrome\_\_\* tools, liệt kê các skill có sẵn: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review, /setup-browser-cookies, /retro, /investigate, /document-release, /codex, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade, và nói với Claude rằng nếu gstack skills không hoạt động, chạy `cd .claude/skills/gstack && ./setup` để build binary và đăng ký skills.
 
-Real files get committed to your repo (not a submodule), so `git clone` just works. Everything lives inside `.claude/`. Nothing touches your PATH or runs in the background.
+Các file thực sự được commit vào repo của bạn (không phải submodule), vì vậy `git clone` hoạt động bình thường. Mọi thứ nằm trong `.claude/`. Không có gì chạm vào PATH hoặc chạy trong nền.
 
-## See it work
+## Xem nó hoạt động
 
 ```
-You:    I want to build a daily briefing app for my calendar.
-You:    /office-hours
-Claude: [asks about the pain — specific examples, not hypotheticals]
+Bạn:    Tôi muốn xây dựng ứng dụng briefing hàng ngày cho lịch của tôi.
+Bạn:    /office-hours
+Claude: [hỏi về nỗi đau — ví dụ cụ thể, không phải giả thuyết]
 
-You:    Multiple Google calendars, events with stale info, wrong locations.
-        Prep takes forever and the results aren't good enough...
+Bạn:    Nhiều Google calendar, sự kiện với thông tin cũ, địa điểm sai.
+        Chuẩn bị mất quá nhiều thời gian và kết quả không đủ tốt...
 
-Claude: I'm going to push back on the framing. You said "daily briefing
-        app." But what you actually described is a personal chief of
-        staff AI.
-        [extracts 5 capabilities you didn't realize you were describing]
-        [challenges 4 premises — you agree, disagree, or adjust]
-        [generates 3 implementation approaches with effort estimates]
-        RECOMMENDATION: Ship the narrowest wedge tomorrow, learn from
-        real usage. The full vision is a 3-month project — start with
-        the daily briefing that actually works.
-        [writes design doc → feeds into downstream skills automatically]
+Claude: Tôi sẽ phản bác cách định khung. Bạn nói "ứng dụng briefing
+        hàng ngày." Nhưng những gì bạn thực sự mô tả là AI trợ lý
+        cá nhân.
+        [trích xuất 5 khả năng bạn chưa nhận ra mình đang mô tả]
+        [thách thức 4 tiền đề — bạn đồng ý, không đồng ý, hoặc điều chỉnh]
+        [tạo ra 3 cách tiếp cận triển khai với ước tính nỗ lực]
+        KHUYẾN NGHỊ: Ship wedge hẹp nhất vào ngày mai, học từ
+        việc sử dụng thực tế. Tầm nhìn đầy đủ là dự án 3 tháng — bắt đầu với
+        briefing hàng ngày thực sự hoạt động.
+        [viết design doc → tự động đưa vào các skill downstream]
 
-You:    /plan-ceo-review
-        [reads the design doc, challenges scope, runs 10-section review]
+Bạn:    /plan-ceo-review
+        [đọc design doc, thách thức phạm vi, chạy review 10 phần]
 
-You:    /plan-eng-review
-        [ASCII diagrams for data flow, state machines, error paths]
-        [test matrix, failure modes, security concerns]
+Bạn:    /plan-eng-review
+        [sơ đồ ASCII cho luồng dữ liệu, state machine, error path]
+        [ma trận test, failure mode, vấn đề bảo mật]
 
-You:    Approve plan. Exit plan mode.
-        [writes 2,400 lines across 11 files. ~8 minutes.]
+Bạn:    Phê duyệt kế hoạch. Thoát chế độ lập kế hoạch.
+        [viết 2.400 dòng trên 11 file. ~8 phút.]
 
-You:    /review
-        [AUTO-FIXED] 2 issues. [ASK] Race condition → you approve fix.
+Bạn:    /review
+        [TỰ ĐỘNG SỬA] 2 vấn đề. [HỎI] Race condition → bạn phê duyệt sửa.
 
-You:    /qa https://staging.myapp.com
-        [opens real browser, clicks through flows, finds and fixes a bug]
+Bạn:    /qa https://staging.myapp.com
+        [mở browser thực, click qua các luồng, tìm và sửa lỗi]
 
-You:    /ship
-        Tests: 42 → 51 (+9 new). PR: github.com/you/app/pull/42
+Bạn:    /ship
+        Test: 42 → 51 (+9 mới). PR: github.com/ban/app/pull/42
 ```
 
-You said "daily briefing app." The agent said "you're building a chief of staff AI" — because it listened to your pain, not your feature request. Then it challenged your premises, generated three approaches, recommended the narrowest wedge, and wrote a design doc that fed into every downstream skill. Eight commands. That is not a copilot. That is a team.
+Bạn nói "ứng dụng briefing hàng ngày." Agent nói "bạn đang xây dựng AI trợ lý cá nhân" — vì nó lắng nghe nỗi đau của bạn, không phải yêu cầu tính năng của bạn. Sau đó nó thách thức tiền đề của bạn, tạo ra ba cách tiếp cận, khuyến nghị wedge hẹp nhất, và viết design doc đưa vào mọi skill downstream. Tám lệnh. Đó không phải là copilot. Đó là một đội.
 
-## The sprint
+## Sprint
 
-gstack is a process, not a collection of tools. The skills are ordered the way a sprint runs:
+gstack là một quy trình, không phải tập hợp công cụ. Các skill được sắp xếp theo cách một sprint chạy:
 
-**Think → Plan → Build → Review → Test → Ship → Reflect**
+**Suy nghĩ → Lập kế hoạch → Xây dựng → Review → Test → Ship → Phản ánh**
 
-Each skill feeds into the next. `/office-hours` writes a design doc that `/plan-ceo-review` reads. `/plan-eng-review` writes a test plan that `/qa` picks up. `/review` catches bugs that `/ship` verifies are fixed. Nothing falls through the cracks because every step knows what came before it.
+Mỗi skill đưa vào skill tiếp theo. `/office-hours` viết design doc mà `/plan-ceo-review` đọc. `/plan-eng-review` viết test plan mà `/qa` nhận. `/review` bắt lỗi mà `/ship` xác minh đã được sửa. Không có gì bị bỏ sót vì mỗi bước biết những gì đến trước nó.
 
-One sprint, one person, one feature — that takes about 30 minutes with gstack. But here's what changes everything: you can run 10-15 of these sprints in parallel. Different features, different branches, different agents — all at the same time. That is how I ship 10,000+ lines of production code per day while doing my actual job.
+Một sprint, một người, một tính năng — mất khoảng 30 phút với gstack. Nhưng đây là điều thay đổi tất cả: bạn có thể chạy 10-15 sprint này song song. Các tính năng khác nhau, nhánh khác nhau, agent khác nhau — tất cả cùng một lúc. Đó là cách tôi ship hơn 10.000 dòng code production mỗi ngày trong khi làm công việc thực sự của mình.
 
-| Skill | Your specialist | What they do |
+| Skill | Chuyên gia của bạn | Họ làm gì |
 |-------|----------------|--------------|
-| `/office-hours` | **YC Office Hours** | Start here. Six forcing questions that reframe your product before you write code. Pushes back on your framing, challenges premises, generates implementation alternatives. Design doc feeds into every downstream skill. |
-| `/plan-ceo-review` | **CEO / Founder** | Rethink the problem. Find the 10-star product hiding inside the request. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction. |
-| `/plan-eng-review` | **Eng Manager** | Lock in architecture, data flow, diagrams, edge cases, and tests. Forces hidden assumptions into the open. |
-| `/plan-design-review` | **Senior Designer** | Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. AI Slop detection. Interactive — one AskUserQuestion per design choice. |
-| `/design-consultation` | **Design Partner** | Build a complete design system from scratch. Knows the landscape, proposes creative risks, generates realistic product mockups. Design at the heart of all other phases. |
-| `/review` | **Staff Engineer** | Find the bugs that pass CI but blow up in production. Auto-fixes the obvious ones. Flags completeness gaps. |
-| `/investigate` | **Debugger** | Systematic root-cause debugging. Iron Law: no fixes without investigation. Traces data flow, tests hypotheses, stops after 3 failed fixes. |
-| `/design-review` | **Designer Who Codes** | Same audit as /plan-design-review, then fixes what it finds. Atomic commits, before/after screenshots. |
-| `/qa` | **QA Lead** | Test your app, find bugs, fix them with atomic commits, re-verify. Auto-generates regression tests for every fix. |
-| `/qa-only` | **QA Reporter** | Same methodology as /qa but report only. Use when you want a pure bug report without code changes. |
-| `/ship` | **Release Engineer** | Sync main, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one. One command. |
-| `/document-release` | **Technical Writer** | Update all project docs to match what you just shipped. Catches stale READMEs automatically. |
-| `/retro` | **Eng Manager** | Team-aware weekly retro. Per-person breakdowns, shipping streaks, test health trends, growth opportunities. |
-| `/browse` | **QA Engineer** | Give the agent eyes. Real Chromium browser, real clicks, real screenshots. ~100ms per command. |
-| `/setup-browser-cookies` | **Session Manager** | Import cookies from your real browser (Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages. |
+| `/office-hours` | **YC Office Hours** | Bắt đầu ở đây. Sáu câu hỏi bắt buộc tái định khung sản phẩm của bạn trước khi bạn viết code. Phản bác cách định khung của bạn, thách thức tiền đề, tạo ra các giải pháp triển khai thay thế. Design doc đưa vào mọi skill downstream. |
+| `/plan-ceo-review` | **CEO / Người sáng lập** | Suy nghĩ lại vấn đề. Tìm sản phẩm 10 sao ẩn bên trong yêu cầu. Bốn chế độ: Mở rộng, Mở rộng có chọn lọc, Giữ phạm vi, Thu hẹp. |
+| `/plan-eng-review` | **Eng Manager** | Khóa kiến trúc, luồng dữ liệu, sơ đồ, edge case và test. Buộc các giả định ẩn ra ngoài ánh sáng. |
+| `/plan-design-review` | **Senior Designer** | Đánh giá mỗi chiều thiết kế 0-10, giải thích điểm 10 trông như thế nào, sau đó chỉnh sửa kế hoạch để đạt được đó. Phát hiện AI Slop. Tương tác — một AskUserQuestion cho mỗi lựa chọn thiết kế. |
+| `/design-consultation` | **Đối tác Thiết kế** | Xây dựng design system hoàn chỉnh từ đầu. Biết toàn cảnh, đề xuất rủi ro sáng tạo, tạo mockup sản phẩm thực tế. Thiết kế ở trung tâm của tất cả các giai đoạn khác. |
+| `/review` | **Staff Engineer** | Tìm lỗi qua CI nhưng nổ tung trong production. Tự động sửa những lỗi rõ ràng. Gắn cờ khoảng trống hoàn chỉnh. |
+| `/investigate` | **Debugger** | Debug tìm root-cause có hệ thống. Luật Sắt: không sửa mà không có điều tra. Theo dõi luồng dữ liệu, kiểm tra giả thuyết, dừng sau 3 lần sửa thất bại. |
+| `/design-review` | **Designer Biết Code** | Cùng kiểm tra như /plan-design-review, sau đó sửa những gì nó tìm thấy. Atomic commit, ảnh chụp màn hình trước/sau. |
+| `/qa` | **QA Lead** | Test ứng dụng của bạn, tìm lỗi, sửa chúng với atomic commit, xác minh lại. Tự động tạo regression test cho mỗi lần sửa. |
+| `/qa-only` | **QA Reporter** | Cùng phương pháp như /qa nhưng chỉ báo cáo. Dùng khi bạn muốn báo cáo lỗi thuần túy mà không thay đổi code. |
+| `/ship` | **Release Engineer** | Đồng bộ main, chạy test, kiểm tra coverage, push, mở PR. Bootstrap test framework nếu bạn chưa có. Một lệnh. |
+| `/document-release` | **Technical Writer** | Cập nhật tất cả tài liệu dự án để khớp với những gì bạn vừa ship. Tự động phát hiện README cũ. |
+| `/retro` | **Eng Manager** | Retro hàng tuần nhận biết đội. Phân tích theo từng người, chuỗi ship, xu hướng sức khỏe test, cơ hội phát triển. |
+| `/browse` | **QA Engineer** | Cho agent đôi mắt. Browser Chromium thực, click thực, ảnh chụp màn hình thực. ~100ms mỗi lệnh. |
+| `/setup-browser-cookies` | **Session Manager** | Nhập cookie từ browser thực của bạn (Chrome, Arc, Brave, Edge) vào phiên headless. Test các trang đã xác thực. |
 
-### Power tools
+### Công cụ mạnh mẽ
 
-| Skill | What it does |
+| Skill | Chức năng |
 |-------|-------------|
-| `/codex` | **Second Opinion** — independent code review from OpenAI Codex CLI. Three modes: review (pass/fail gate), adversarial challenge, and open consultation. Cross-model analysis when both `/review` and `/codex` have run. |
-| `/careful` | **Safety Guardrails** — warns before destructive commands (rm -rf, DROP TABLE, force-push). Say "be careful" to activate. Override any warning. |
-| `/freeze` | **Edit Lock** — restrict file edits to one directory. Prevents accidental changes outside scope while debugging. |
-| `/guard` | **Full Safety** — `/careful` + `/freeze` in one command. Maximum safety for prod work. |
-| `/unfreeze` | **Unlock** — remove the `/freeze` boundary. |
-| `/gstack-upgrade` | **Self-Updater** — upgrade gstack to latest. Detects global vs vendored install, syncs both, shows what changed. |
+| `/codex` | **Ý kiến thứ hai** — code review độc lập từ OpenAI Codex CLI. Ba chế độ: review (cổng pass/fail), thách thức đối lập, và tư vấn mở. Phân tích đa mô hình khi cả `/review` và `/codex` đã chạy. |
+| `/careful` | **Bảo vệ an toàn** — cảnh báo trước các lệnh phá hủy (rm -rf, DROP TABLE, force-push). Nói "be careful" để kích hoạt. Ghi đè bất kỳ cảnh báo nào. |
+| `/freeze` | **Khóa chỉnh sửa** — hạn chế chỉnh sửa file vào một thư mục. Ngăn thay đổi vô tình ngoài phạm vi khi debug. |
+| `/guard` | **An toàn đầy đủ** — `/careful` + `/freeze` trong một lệnh. An toàn tối đa cho công việc prod. |
+| `/unfreeze` | **Mở khóa** — xóa ranh giới `/freeze`. |
+| `/gstack-upgrade` | **Tự cập nhật** — nâng cấp gstack lên phiên bản mới nhất. Phát hiện cài đặt toàn cục vs vendored, đồng bộ cả hai, hiển thị những gì đã thay đổi. |
 
-**[Deep dives with examples and philosophy for every skill →](docs/skills.md)**
+**[Tìm hiểu sâu với ví dụ và triết lý cho mọi skill →](docs/skills.md)**
 
-## What's new and why it matters
+## Tính năng mới và tại sao chúng quan trọng
 
-**`/office-hours` reframes your product before you write code.** You say "daily briefing app." It listens to your actual pain, pushes back on the framing, tells you you're really building a personal chief of staff AI, challenges your premises, and generates three implementation approaches with effort estimates. The design doc it writes feeds directly into `/plan-ceo-review` and `/plan-eng-review` — so every downstream skill starts with real clarity instead of a vague feature request.
+**`/office-hours` tái định khung sản phẩm của bạn trước khi bạn viết code.** Bạn nói "ứng dụng briefing hàng ngày." Nó lắng nghe nỗi đau thực sự của bạn, phản bác cách định khung, nói với bạn rằng bạn thực sự đang xây dựng AI trợ lý cá nhân, thách thức tiền đề của bạn, và tạo ra ba cách tiếp cận triển khai với ước tính nỗ lực. Design doc nó viết đưa trực tiếp vào `/plan-ceo-review` và `/plan-eng-review` — vì vậy mọi skill downstream bắt đầu với sự rõ ràng thực sự thay vì yêu cầu tính năng mơ hồ.
 
-**Design is at the heart.** `/design-consultation` doesn't just pick fonts. It researches what's out there in your space, proposes safe choices AND creative risks, generates realistic mockups of your actual product, and writes `DESIGN.md` — and then `/design-review` and `/plan-eng-review` read what you chose. Design decisions flow through the whole system.
+**Thiết kế ở trung tâm.** `/design-consultation` không chỉ chọn font. Nó nghiên cứu những gì đang có trong không gian của bạn, đề xuất các lựa chọn an toàn VÀ rủi ro sáng tạo, tạo mockup thực tế của sản phẩm thực tế của bạn, và viết `DESIGN.md` — và sau đó `/design-review` và `/plan-eng-review` đọc những gì bạn đã chọn. Các quyết định thiết kế chảy qua toàn bộ hệ thống.
 
-**`/qa` was a massive unlock.** It let me go from 6 to 12 parallel workers. Claude Code saying *"I SEE THE ISSUE"* and then actually fixing it, generating a regression test, and verifying the fix — that changed how I work. The agent has eyes now.
+**`/qa` là một bước ngoặt lớn.** Nó cho phép tôi tăng từ 6 lên 12 worker song song. Claude Code nói *"TÔI THẤY VẤN ĐỀ"* và sau đó thực sự sửa nó, tạo regression test, và xác minh lần sửa — điều đó đã thay đổi cách tôi làm việc. Agent bây giờ có đôi mắt.
 
-**Smart review routing.** Just like at a well-run startup: CEO doesn't have to look at infra bug fixes, design review isn't needed for backend changes. gstack tracks what reviews are run, figures out what's appropriate, and just does the smart thing. The Review Readiness Dashboard tells you where you stand before you ship.
+**Định tuyến review thông minh.** Giống như tại một startup hoạt động tốt: CEO không cần xem xét các sửa lỗi cơ sở hạ tầng, design review không cần thiết cho các thay đổi backend. gstack theo dõi những review nào được chạy, tìm ra điều gì phù hợp, và chỉ làm điều thông minh. Review Readiness Dashboard cho bạn biết bạn đang đứng ở đâu trước khi ship.
 
-**Test everything.** `/ship` bootstraps test frameworks from scratch if your project doesn't have one. Every `/ship` run produces a coverage audit. Every `/qa` bug fix generates a regression test. 100% test coverage is the goal — tests make vibe coding safe instead of yolo coding.
+**Test mọi thứ.** `/ship` bootstrap test framework từ đầu nếu dự án của bạn chưa có. Mỗi lần chạy `/ship` tạo ra kiểm tra coverage. Mỗi lần sửa lỗi `/qa` tạo ra regression test. Mục tiêu là 100% test coverage — test làm cho vibe coding an toàn thay vì yolo coding.
 
-**`/document-release` is the engineer you never had.** It reads every doc file in your project, cross-references the diff, and updates everything that drifted. README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS — all kept current automatically. And now `/ship` auto-invokes it — docs stay current without an extra command.
+**`/document-release` là kỹ sư bạn chưa từng có.** Nó đọc mọi file tài liệu trong dự án của bạn, đối chiếu với diff, và cập nhật mọi thứ đã lỗi thời. README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS — tất cả được cập nhật tự động. Và bây giờ `/ship` tự động gọi nó — tài liệu luôn cập nhật mà không cần thêm lệnh.
 
-**Browser handoff when the AI gets stuck.** Hit a CAPTCHA, auth wall, or MFA prompt? `$B handoff` opens a visible Chrome at the exact same page with all your cookies and tabs intact. Solve the problem, tell Claude you're done, `$B resume` picks up right where it left off. The agent even suggests it automatically after 3 consecutive failures.
+**Chuyển giao browser khi AI bị kẹt.** Gặp CAPTCHA, tường auth, hoặc MFA? `$B handoff` mở Chrome hiển thị tại cùng trang đó với tất cả cookie và tab của bạn. Giải quyết vấn đề, nói với Claude bạn đã xong, `$B resume` tiếp tục ngay chỗ đã dừng. Agent thậm chí tự động gợi ý sau 3 lần thất bại liên tiếp.
 
-**Multi-AI second opinion.** `/codex` gets an independent review from OpenAI's Codex CLI — a completely different AI looking at the same diff. Three modes: code review with a pass/fail gate, adversarial challenge that actively tries to break your code, and open consultation with session continuity. When both `/review` (Claude) and `/codex` (OpenAI) have reviewed the same branch, you get a cross-model analysis showing which findings overlap and which are unique to each.
+**Ý kiến thứ hai từ nhiều AI.** `/codex` nhận review độc lập từ OpenAI's Codex CLI — một AI hoàn toàn khác nhìn vào cùng diff đó. Ba chế độ: code review với cổng pass/fail, thách thức đối lập tích cực cố gắng phá code của bạn, và tư vấn mở với tính liên tục phiên. Khi cả `/review` (Claude) và `/codex` (OpenAI) đã review cùng một nhánh, bạn nhận được phân tích đa mô hình cho thấy các phát hiện nào trùng nhau và cái nào là duy nhất của từng AI.
 
-**Safety guardrails on demand.** Say "be careful" and `/careful` warns before any destructive command — rm -rf, DROP TABLE, force-push, git reset --hard. `/freeze` locks edits to one directory while debugging so Claude can't accidentally "fix" unrelated code. `/guard` activates both. `/investigate` auto-freezes to the module being investigated.
+**Bảo vệ an toàn theo yêu cầu.** Nói "be careful" và `/careful` cảnh báo trước bất kỳ lệnh phá hủy nào — rm -rf, DROP TABLE, force-push, git reset --hard. `/freeze` khóa các chỉnh sửa vào một thư mục khi debug để Claude không thể vô tình "sửa" code không liên quan. `/guard` kích hoạt cả hai. `/investigate` tự động đóng băng vào module đang được điều tra.
 
-**Proactive skill suggestions.** gstack notices what stage you're in — brainstorming, reviewing, debugging, testing — and suggests the right skill. Don't like it? Say "stop suggesting" and it remembers across sessions.
+**Gợi ý skill chủ động.** gstack nhận thấy bạn đang ở giai đoạn nào — brainstorm, review, debug, test — và gợi ý skill phù hợp. Không thích? Nói "stop suggesting" và nó nhớ qua các phiên.
 
-## 10-15 parallel sprints
+## 10-15 sprint song song
 
-gstack is powerful with one sprint. It is transformative with ten running at once.
+gstack mạnh mẽ với một sprint. Nó mang tính biến đổi với mười sprint chạy cùng lúc.
 
-[Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. One session running `/office-hours` on a new idea, another doing `/review` on a PR, a third implementing a feature, a fourth running `/qa` on staging, and six more on other branches. All at the same time. I regularly run 10-15 parallel sprints — that's the practical max right now.
+[Conductor](https://conductor.build) chạy nhiều phiên Claude Code song song — mỗi phiên trong không gian làm việc biệt lập của riêng nó. Một phiên chạy `/office-hours` về ý tưởng mới, một phiên khác làm `/review` về PR, phiên thứ ba triển khai tính năng, phiên thứ tư chạy `/qa` trên staging, và sáu phiên khác trên các nhánh khác. Tất cả cùng một lúc. Tôi thường xuyên chạy 10-15 sprint song song — đó là max thực tế hiện tại.
 
-The sprint structure is what makes parallelism work. Without a process, ten agents is ten sources of chaos. With a process — think, plan, build, review, test, ship — each agent knows exactly what to do and when to stop. You manage them the way a CEO manages a team: check in on the decisions that matter, let the rest run.
+Cấu trúc sprint là điều làm cho tính song song hoạt động. Không có quy trình, mười agent là mười nguồn hỗn loạn. Với quy trình — suy nghĩ, lập kế hoạch, xây dựng, review, test, ship — mỗi agent biết chính xác phải làm gì và khi nào dừng. Bạn quản lý chúng theo cách một CEO quản lý đội: kiểm tra các quyết định quan trọng, để phần còn lại chạy.
 
 ---
 
-## Come ride the wave
+## Cùng đón sóng
 
-This is **free, MIT licensed, open source, available now.** No premium tier. No waitlist. No strings.
+Đây là **miễn phí, MIT licensed, mã nguồn mở, có sẵn ngay bây giờ.** Không có gói premium. Không có danh sách chờ. Không có ràng buộc.
 
-I open sourced how I do development and I am actively upgrading my own software factory here. You can fork it and make it your own. That's the whole point. I want everyone on this journey.
+Tôi đã mã nguồn mở cách tôi phát triển và tôi đang tích cực nâng cấp nhà máy phần mềm của mình tại đây. Bạn có thể fork nó và làm cho nó của bạn. Đó là toàn bộ mục đích. Tôi muốn mọi người trong hành trình này.
 
-Same tools, different outcome — because gstack gives you structured roles and review gates, not generic agent chaos. That governance is the difference between shipping fast and shipping reckless.
+Cùng công cụ, kết quả khác nhau — vì gstack cung cấp cho bạn các vai trò có cấu trúc và cổng review, không phải hỗn loạn agent chung chung. Sự quản trị đó là sự khác biệt giữa ship nhanh và ship liều lĩnh.
 
-The models are getting better fast. The people who figure out how to work with them now — really work with them, not just dabble — are going to have a massive advantage. This is that window. Let's go.
+Các mô hình đang tốt hơn nhanh chóng. Những người tìm ra cách làm việc với chúng bây giờ — thực sự làm việc với chúng, không chỉ thử — sẽ có lợi thế lớn. Đây là cửa sổ đó. Tiến lên.
 
-Fifteen specialists and six power tools. All slash commands. All Markdown. All free. **[github.com/garrytan/gstack](https://github.com/garrytan/gstack)** — MIT License
+Mười lăm chuyên gia và sáu công cụ mạnh mẽ. Tất cả là slash command. Tất cả là Markdown. Tất cả miễn phí. **[github.com/garrytan/gstack](https://github.com/garrytan/gstack)** — MIT License
 
-> **We're hiring.** Want to ship 10K+ LOC/day and help harden gstack?
-> Come work at YC — [ycombinator.com/software](https://ycombinator.com/software)
-> Extremely competitive salary and equity. San Francisco, Dogpatch District.
+> **Chúng tôi đang tuyển dụng.** Muốn ship hơn 10K+ LOC/ngày và giúp củng cố gstack?
+> Đến làm việc tại YC — [ycombinator.com/software](https://ycombinator.com/software)
+> Lương và cổ phần cực kỳ cạnh tranh. San Francisco, Khu vực Dogpatch.
 
-## Docs
+## Tài liệu
 
-| Doc | What it covers |
+| Tài liệu | Nội dung |
 |-----|---------------|
-| [Skill Deep Dives](docs/skills.md) | Philosophy, examples, and workflow for every skill (includes Greptile integration) |
-| [Architecture](ARCHITECTURE.md) | Design decisions and system internals |
-| [Browser Reference](BROWSER.md) | Full command reference for `/browse` |
-| [Contributing](CONTRIBUTING.md) | Dev setup, testing, contributor mode, and dev mode |
-| [Changelog](CHANGELOG.md) | What's new in every version |
+| [Tìm hiểu sâu về Skill](docs/skills.md) | Triết lý, ví dụ và quy trình cho mọi skill (bao gồm tích hợp Greptile) |
+| [Kiến trúc](ARCHITECTURE.md) | Quyết định thiết kế và nội bộ hệ thống |
+| [Tham khảo Browser](BROWSER.md) | Tham khảo lệnh đầy đủ cho `/browse` |
+| [Đóng góp](CONTRIBUTING.md) | Cài đặt dev, testing, chế độ contributor và dev mode |
+| [Changelog](CHANGELOG.md) | Tính năng mới trong mỗi phiên bản |
 
-## Privacy & Telemetry
+## Quyền riêng tư & Telemetry
 
-gstack includes **opt-in** usage telemetry to help improve the project. Here's exactly what happens:
+gstack bao gồm telemetry sử dụng **opt-in** để giúp cải thiện dự án. Đây là chính xác những gì xảy ra:
 
-- **Default is off.** Nothing is sent anywhere unless you explicitly say yes.
-- **On first run,** gstack asks if you want to share anonymous usage data. You can say no.
-- **What's sent (if you opt in):** skill name, duration, success/fail, gstack version, OS. That's it.
-- **What's never sent:** code, file paths, repo names, branch names, prompts, or any user-generated content.
-- **Change anytime:** `gstack-config set telemetry off` disables everything instantly.
+- **Mặc định là tắt.** Không có gì được gửi đi trừ khi bạn đồng ý rõ ràng.
+- **Lần chạy đầu tiên,** gstack hỏi bạn có muốn chia sẻ dữ liệu sử dụng ẩn danh không. Bạn có thể nói không.
+- **Những gì được gửi (nếu bạn opt in):** tên skill, thời gian, thành công/thất bại, phiên bản gstack, OS. Chỉ vậy thôi.
+- **Những gì không bao giờ được gửi:** code, đường dẫn file, tên repo, tên nhánh, prompt, hoặc bất kỳ nội dung do người dùng tạo ra.
+- **Thay đổi bất cứ lúc nào:** `gstack-config set telemetry off` vô hiệu hóa mọi thứ ngay lập tức.
 
-Data is stored in [Supabase](https://supabase.com) (open source Firebase alternative). The schema is in [`supabase/migrations/001_telemetry.sql`](supabase/migrations/001_telemetry.sql) — you can verify exactly what's collected. The Supabase publishable key in the repo is a public key (like a Firebase API key) — row-level security policies restrict it to insert-only access.
+Dữ liệu được lưu trong [Supabase](https://supabase.com) (giải pháp thay thế Firebase mã nguồn mở). Schema nằm trong [`supabase/migrations/001_telemetry.sql`](supabase/migrations/001_telemetry.sql) — bạn có thể xác minh chính xác những gì được thu thập. Khóa publishable Supabase trong repo là khóa công khai (như Firebase API key) — chính sách bảo mật cấp hàng hạn chế nó chỉ có quyền truy cập insert.
 
-**Local analytics are always available.** Run `gstack-analytics` to see your personal usage dashboard from the local JSONL file — no remote data needed.
+**Phân tích cục bộ luôn có sẵn.** Chạy `gstack-analytics` để xem bảng điều khiển sử dụng cá nhân của bạn từ file JSONL cục bộ — không cần dữ liệu từ xa.
 
-## Troubleshooting
+## Khắc phục sự cố
 
-**Skill not showing up?** `cd ~/.claude/skills/gstack && ./setup`
+**Skill không hiển thị?** `cd ~/.claude/skills/gstack && ./setup`
 
-**`/browse` fails?** `cd ~/.claude/skills/gstack && bun install && bun run build`
+**`/browse` thất bại?** `cd ~/.claude/skills/gstack && bun install && bun run build`
 
-**Stale install?** Run `/gstack-upgrade` — or set `auto_upgrade: true` in `~/.gstack/config.yaml`
+**Cài đặt cũ?** Chạy `/gstack-upgrade` — hoặc đặt `auto_upgrade: true` trong `~/.gstack/config.yaml`
 
-**Claude says it can't see the skills?** Make sure your project's `CLAUDE.md` has a gstack section. Add this:
+**Claude nói không thể thấy các skill?** Đảm bảo CLAUDE.md của dự án có phần gstack. Thêm phần này:
 
 ```
 ## gstack
-Use /browse from gstack for all web browsing. Never use mcp__claude-in-chrome__* tools.
-Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
+Dùng /browse từ gstack cho tất cả duyệt web. Không bao giờ dùng mcp__claude-in-chrome__* tools.
+Các skill có sẵn: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
 /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review,
 /setup-browser-cookies, /retro, /investigate, /document-release, /codex, /careful,
 /freeze, /guard, /unfreeze, /gstack-upgrade.
 ```
 
-## License
+## Giấy phép
 
-MIT. Free forever. Go build something.
+MIT. Miễn phí mãi mãi. Hãy xây dựng thứ gì đó.

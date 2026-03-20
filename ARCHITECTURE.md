@@ -1,15 +1,15 @@
 # Kiến trúc
 
-Tài liệu này giải thích **lý do** gstack được xây dựng theo cách này. Để biết cách cài đặt và các lệnh, xem CLAUDE.md. Để biết cách đóng góp, xem CONTRIBUTING.md.
+Tài liệu này giải thích **lý do** antidev được xây dựng theo cách này. Để biết cách cài đặt và các lệnh, xem CLAUDE.md. Để biết cách đóng góp, xem CONTRIBUTING.md.
 
 ## Ý tưởng cốt lõi
 
-gstack cung cấp cho Claude Code một trình duyệt liên tục và một bộ kỹ năng quy trình làm việc được thiết kế sẵn. Phần trình duyệt là phần khó nhất — mọi thứ còn lại chỉ là Markdown.
+antidev cung cấp cho Claude Code một trình duyệt liên tục và một bộ kỹ năng quy trình làm việc được thiết kế sẵn. Phần trình duyệt là phần khó nhất — mọi thứ còn lại chỉ là Markdown.
 
-Điểm mấu chốt: một AI agent tương tác với trình duyệt cần **độ trễ dưới một giây** và **trạng thái liên tục**. Nếu mỗi lệnh khởi động trình duyệt từ đầu, bạn sẽ phải chờ 3-5 giây mỗi lần gọi công cụ. Nếu trình duyệt bị tắt giữa các lệnh, bạn mất cookie, tab và phiên đăng nhập. Vì vậy gstack chạy một Chromium daemon lâu dài mà CLI giao tiếp qua localhost HTTP.
+Điểm mấu chốt: một AI agent tương tác với trình duyệt cần **độ trễ dưới một giây** và **trạng thái liên tục**. Nếu mỗi lệnh khởi động trình duyệt từ đầu, bạn sẽ phải chờ 3-5 giây mỗi lần gọi công cụ. Nếu trình duyệt bị tắt giữa các lệnh, bạn mất cookie, tab và phiên đăng nhập. Vì vậy antidev chạy một Chromium daemon lâu dài mà CLI giao tiếp qua localhost HTTP.
 
 ```
-Claude Code                     gstack
+Claude Code                     antidev
 ─────────                      ──────
                                ┌──────────────────────┐
   Tool call: $B snapshot -i    │  CLI (compiled binary)│
@@ -39,7 +39,7 @@ Lần gọi đầu tiên khởi động mọi thứ (~3s). Mỗi lần gọi sau
 
 Node.js cũng hoạt động được. Bun tốt hơn ở đây vì ba lý do:
 
-1. **Binary được biên dịch sẵn.** `bun build --compile` tạo ra một file thực thi đơn ~58MB. Không cần `node_modules` khi chạy, không cần `npx`, không cần cấu hình PATH. Binary chỉ cần chạy là xong. Điều này quan trọng vì gstack cài vào `~/.claude/skills/` nơi người dùng không muốn quản lý một project Node.js.
+1. **Binary được biên dịch sẵn.** `bun build --compile` tạo ra một file thực thi đơn ~58MB. Không cần `node_modules` khi chạy, không cần `npx`, không cần cấu hình PATH. Binary chỉ cần chạy là xong. Điều này quan trọng vì antidev cài vào `~/.claude/skills/` nơi người dùng không muốn quản lý một project Node.js.
 
 2. **SQLite gốc.** Giải mã cookie đọc trực tiếp cơ sở dữ liệu SQLite cookie của Chromium. Bun có `new Database()` tích hợp sẵn — không cần `better-sqlite3`, không cần biên dịch addon gốc, không cần gyp. Ít thứ bị hỏng hơn trên các máy khác nhau.
 
@@ -63,7 +63,7 @@ Mô hình daemon có nghĩa là:
 
 ### File trạng thái
 
-Server ghi `.gstack/browse.json` (ghi nguyên tử qua tmp + đổi tên, mode 0o600):
+Server ghi `.antidev/browse.json` (ghi nguyên tử qua tmp + đổi tên, mode 0o600):
 
 ```json
 { "pid": 12345, "port": 34567, "token": "uuid-v4", "startedAt": "...", "binaryVersion": "abc123" }
@@ -93,13 +93,13 @@ Mỗi phiên server tạo một UUID token ngẫu nhiên, được ghi vào file
 
 ### Bảo mật cookie
 
-Cookie là dữ liệu nhạy cảm nhất mà gstack xử lý. Thiết kế:
+Cookie là dữ liệu nhạy cảm nhất mà antidev xử lý. Thiết kế:
 
-1. **Truy cập Keychain yêu cầu phê duyệt người dùng.** Lần đầu import cookie cho mỗi trình duyệt kích hoạt hộp thoại macOS Keychain. Người dùng phải nhấp "Allow" hoặc "Always Allow." gstack không bao giờ truy cập thông tin xác thực một cách lặng lẽ.
+1. **Truy cập Keychain yêu cầu phê duyệt người dùng.** Lần đầu import cookie cho mỗi trình duyệt kích hoạt hộp thoại macOS Keychain. Người dùng phải nhấp "Allow" hoặc "Always Allow." antidev không bao giờ truy cập thông tin xác thực một cách lặng lẽ.
 
 2. **Giải mã xảy ra trong tiến trình.** Giá trị cookie được giải mã trong bộ nhớ (PBKDF2 + AES-128-CBC), tải vào Playwright context, và không bao giờ ghi ra đĩa ở dạng plaintext. Cookie picker UI không bao giờ hiển thị giá trị cookie — chỉ tên miền và số lượng.
 
-3. **Cơ sở dữ liệu chỉ đọc.** gstack sao chép Chromium cookie DB sang file tạm (để tránh xung đột SQLite lock với trình duyệt đang chạy) và mở ở chế độ chỉ đọc. Nó không bao giờ chỉnh sửa cơ sở dữ liệu cookie thực của trình duyệt bạn.
+3. **Cơ sở dữ liệu chỉ đọc.** antidev sao chép Chromium cookie DB sang file tạm (để tránh xung đột SQLite lock với trình duyệt đang chạy) và mở ở chế độ chỉ đọc. Nó không bao giờ chỉnh sửa cơ sở dữ liệu cookie thực của trình duyệt bạn.
 
 4. **Cache key theo phiên.** Mật khẩu Keychain + AES key dẫn xuất được cache trong bộ nhớ cho suốt thời gian sống của server. Khi server tắt (idle timeout hoặc dừng tường minh), cache bị xóa.
 
@@ -164,7 +164,7 @@ Flag `-C` tìm các phần tử có thể nhấp nhưng không có trong cây AR
 Ba ring buffer (50.000 entry mỗi cái, O(1) push):
 
 ```
-Browser events → CircularBuffer (in-memory) → Async flush to .gstack/*.log
+Browser events → CircularBuffer (in-memory) → Async flush to .antidev/*.log
 ```
 
 Tin nhắn console, yêu cầu network, và sự kiện dialog mỗi loại có buffer riêng. Flush xảy ra mỗi 1 giây — server chỉ append các entry mới kể từ lần flush cuối. Điều này có nghĩa là:
@@ -212,9 +212,9 @@ Template chứa các quy trình làm việc, mẹo và ví dụ cần có sự p
 
 Mỗi skill bắt đầu với một khối `{{PREAMBLE}}` chạy trước logic riêng của skill. Nó xử lý bốn thứ trong một lệnh bash duy nhất:
 
-1. **Kiểm tra cập nhật** — gọi `gstack-update-check`, báo cáo nếu có bản nâng cấp.
-2. **Theo dõi phiên** — touch `~/.gstack/sessions/$PPID` và đếm các phiên đang hoạt động (các file được chỉnh sửa trong 2 giờ qua). Khi 3+ phiên đang chạy, tất cả skill vào "chế độ ELI16" — mỗi câu hỏi định vị lại người dùng về ngữ cảnh vì họ đang xử lý nhiều cửa sổ.
-3. **Chế độ contributor** — đọc `gstack_contributor` từ config. Khi true, agent ghi các báo cáo thực địa thông thường vào `~/.gstack/contributor-logs/` khi gstack bản thân hoạt động không đúng.
+1. **Kiểm tra cập nhật** — gọi `antidev-update-check`, báo cáo nếu có bản nâng cấp.
+2. **Theo dõi phiên** — touch `~/.antidev/sessions/$PPID` và đếm các phiên đang hoạt động (các file được chỉnh sửa trong 2 giờ qua). Khi 3+ phiên đang chạy, tất cả skill vào "chế độ ELI16" — mỗi câu hỏi định vị lại người dùng về ngữ cảnh vì họ đang xử lý nhiều cửa sổ.
+3. **Chế độ contributor** — đọc `antidev_contributor` từ config. Khi true, agent ghi các báo cáo thực địa thông thường vào `~/.antidev/contributor-logs/` khi antidev bản thân hoạt động không đúng.
 4. **Định dạng AskUserQuestion** — định dạng phổ quát: ngữ cảnh, câu hỏi, `RECOMMENDATION: Choose X because ___`, các lựa chọn theo chữ cái. Nhất quán trên tất cả skill.
 
 ### Tại sao committed, không được tạo lúc runtime?
@@ -308,7 +308,7 @@ Hàm `parseNDJSON()` là thuần túy — không có I/O, không có side effect
   │  on failure:
   │  {name}-failure.json
   │
-  │  ALL files in ~/.gstack-dev/
+  │  ALL files in ~/.antidev-dev/
   │  Run dir: e2e-runs/{runId}/
   │
   │         eval-watch.ts
@@ -327,7 +327,7 @@ Hàm `parseNDJSON()` là thuần túy — không có I/O, không có side effect
 
 **Chẩn đoán có thể đọc máy:** Mỗi kết quả bài kiểm tra bao gồm `exit_reason` (success, timeout, error_max_turns, error_api, exit_code_N), `timeout_at_turn`, và `last_tool_call`. Điều này cho phép các truy vấn `jq` như:
 ```bash
-jq '.tests[] | select(.exit_reason == "timeout") | .last_tool_call' ~/.gstack-dev/evals/_partial-e2e.json
+jq '.tests[] | select(.exit_reason == "timeout") | .last_tool_call' ~/.antidev-dev/evals/_partial-e2e.json
 ```
 
 ### Lưu trữ eval (`test/helpers/eval-store.ts`)
@@ -337,7 +337,7 @@ jq '.tests[] | select(.exit_reason == "timeout") | .last_tool_call' ~/.gstack-de
 1. **Tăng dần:** `savePartial()` ghi `_partial-e2e.json` sau mỗi bài kiểm tra (nguyên tử: ghi `.tmp`, `fs.renameSync`). Tồn tại qua các lần kill.
 2. **Cuối cùng:** `finalize()` ghi file eval có timestamp (ví dụ `e2e-20260314-143022.json`). File partial không bao giờ bị dọn dẹp — nó tồn tại cùng với file cuối cùng để quan sát.
 
-`eval:compare` diff hai lần chạy eval. `eval:summary` tổng hợp thống kê trên tất cả các lần chạy trong `~/.gstack-dev/evals/`.
+`eval:compare` diff hai lần chạy eval. `eval:summary` tổng hợp thống kê trên tất cả các lần chạy trong `~/.antidev-dev/evals/`.
 
 ### Các tầng bài kiểm tra
 

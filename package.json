@@ -1,7 +1,7 @@
 {
-  "name": "gstack",
+  "name": "antidev",
   "version": "0.3.3",
-  "description": "Garry's Stack — Claude Code skills + fast headless browser. One repo, one install, entire AI engineering workflow.",
+  "description": "antidev — eUp Group's AI engineering toolkit. Claude Code skills + fast headless browser. Built by Kien Bui, CTO of eUp Group.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -42,7 +42,9 @@
     "cli",
     "claude",
     "ai-agent",
-    "devtools"
+    "devtools",
+    "eup-group",
+    "antidev"
   ],
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.78.0"

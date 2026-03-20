@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# antidev-review-log — atomically log a review result
+# Usage: antidev-review-log '{"skill":"...","timestamp":"...","status":"..."}'
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+eval $("$SCRIPT_DIR/antidev-slug" 2>/dev/null)
+ANTIDEV_HOME="${ANTIDEV_HOME:-$HOME/.antidev}"
+mkdir -p "$ANTIDEV_HOME/projects/$SLUG"
+echo "$1" >> "$ANTIDEV_HOME/projects/$SLUG/$BRANCH-reviews.jsonl"

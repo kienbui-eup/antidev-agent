@@ -19,43 +19,43 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-_UPD=$(~/.claude/skills/gstack/bin/gstack-update-check 2>/dev/null || .claude/skills/gstack/bin/gstack-update-check 2>/dev/null || true)
+_UPD=$(~/.claude/skills/antidev/bin/antidev-update-check 2>/dev/null || .claude/skills/antidev/bin/antidev-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
-mkdir -p ~/.gstack/sessions
-touch ~/.gstack/sessions/"$PPID"
-_SESSIONS=$(find ~/.gstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find ~/.gstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.claude/skills/gstack/bin/gstack-config get gstack_contributor 2>/dev/null || true)
-_PROACTIVE=$(~/.claude/skills/gstack/bin/gstack-config get proactive 2>/dev/null || echo "true")
+mkdir -p ~/.antidev/sessions
+touch ~/.antidev/sessions/"$PPID"
+_SESSIONS=$(find ~/.antidev/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find ~/.antidev/sessions -mmin +120 -type f -delete 2>/dev/null || true
+_CONTRIB=$(~/.claude/skills/antidev/bin/antidev-config get antidev_contributor 2>/dev/null || true)
+_PROACTIVE=$(~/.claude/skills/antidev/bin/antidev-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
-_LAKE_SEEN=$([ -f ~/.gstack/.completeness-intro-seen ] && echo "yes" || echo "no")
+_LAKE_SEEN=$([ -f ~/.antidev/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(~/.claude/skills/gstack/bin/gstack-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f ~/.gstack/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL=$(~/.claude/skills/antidev/bin/antidev-config get telemetry 2>/dev/null || true)
+_TEL_PROMPTED=$([ -f ~/.antidev/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.gstack/analytics
-echo '{"skill":"qa-only","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.gstack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/gstack/bin/gstack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+mkdir -p ~/.antidev/analytics
+echo '{"skill":"qa-only","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.antidev/analytics/skill-usage.jsonl 2>/dev/null || true
+for _PF in ~/.antidev/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/antidev/bin/antidev-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
-If `PROACTIVE` is `"false"`, do not proactively suggest gstack skills — only invoke
+If `PROACTIVE` is `"false"`, do not proactively suggest antidev skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/antidev/antidev-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running antidev v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "gstack follows the **Boil the Lake** principle — always do the complete
-thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
+Tell the user: "antidev follows the **Boil the Lake** principle — always do the complete
+thing when AI makes the marginal cost near-zero. Read more: https://wiki.eup.ai/antidev/completeness-principle"
 Then offer to open the essay in their default browser:
 
 ```bash
-open https://garryslist.org/posts/boil-the-ocean
-touch ~/.gstack/.completeness-intro-seen
+open https://wiki.eup.ai/antidev/completeness-principle
+touch ~/.antidev/.completeness-intro-seen
 ```
 
 Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
@@ -63,20 +63,20 @@ Only run `open` if the user says yes. Always run `touch` to mark as seen. This o
 If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
 ask the user about telemetry. Use AskUserQuestion:
 
-> gstack can share anonymous usage data (which skills you use, how long they take, crash info)
+> antidev can share anonymous usage data (which skills you use, how long they take, crash info)
 > to help improve the project. No code, file paths, or repo names are ever sent.
-> Change anytime with `gstack-config set telemetry off`.
+> Change anytime with `antidev-config set telemetry off`.
 
 Options:
 - A) Yes, share anonymous data (recommended)
 - B) No thanks
 
-If A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
-If B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
+If A: run `~/.claude/skills/antidev/bin/antidev-config set telemetry anonymous`
+If B: run `~/.claude/skills/antidev/bin/antidev-config set telemetry off`
 
 Always run:
 ```bash
-touch ~/.gstack/.telemetry-prompted
+touch ~/.antidev/.telemetry-prompted
 ```
 
 This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
@@ -97,11 +97,11 @@ Per-skill instructions may add additional formatting rules on top of this baseli
 
 AI-assisted coding makes the marginal cost of completeness near-zero. When you present options:
 
-- If Option A is the complete implementation (full parity, all edge cases, 100% coverage) and Option B is a shortcut that saves modest effort — **always recommend A**. The delta between 80 lines and 150 lines is meaningless with CC+gstack. "Good enough" is the wrong instinct when "complete" costs minutes more.
+- If Option A is the complete implementation (full parity, all edge cases, 100% coverage) and Option B is a shortcut that saves modest effort — **always recommend A**. The delta between 80 lines and 150 lines is meaningless with CC+antidev. "Good enough" is the wrong instinct when "complete" costs minutes more.
 - **Lake vs. ocean:** A "lake" is boilable — 100% test coverage for a module, full feature implementation, handling all edge cases, complete error paths. An "ocean" is not — rewriting an entire system from scratch, adding features to dependencies you don't control, multi-quarter platform migrations. Recommend boiling lakes. Flag oceans as out of scope.
-- **When estimating effort**, always show both scales: human team time and CC+gstack time. The compression ratio varies by task type — use this reference:
+- **When estimating effort**, always show both scales: human team time and CC+antidev time. The compression ratio varies by task type — use this reference:
 
-| Task type | Human team | CC+gstack | Compression |
+| Task type | Human team | CC+antidev | Compression |
 |-----------|-----------|-----------|-------------|
 | Boilerplate / scaffolding | 2 days | 15 min | ~100x |
 | Test writing | 1 day | 15 min | ~50x |
@@ -120,20 +120,20 @@ AI-assisted coding makes the marginal cost of completeness near-zero. When you p
 
 ## Contributor Mode
 
-If `_CONTRIB` is `true`: you are in **contributor mode**. You're a gstack user who also helps make it better.
+If `_CONTRIB` is `true`: you are in **contributor mode**. You're a antidev user who also helps make it better.
 
-**At the end of each major workflow step** (not after every single command), reflect on the gstack tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by gstack code or skill markdown — file a field report. Maybe our contributor will help make us better!
+**At the end of each major workflow step** (not after every single command), reflect on the antidev tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by antidev code or skill markdown — file a field report. Maybe our contributor will help make us better!
 
-**Calibration — this is the bar:** For example, `$B js "await fetch(...)"` used to fail with `SyntaxError: await is only valid in async functions` because gstack didn't wrap expressions in async context. Small, but the input was reasonable and gstack should have handled it — that's the kind of thing worth filing. Things less consequential than this, ignore.
+**Calibration — this is the bar:** For example, `$B js "await fetch(...)"` used to fail with `SyntaxError: await is only valid in async functions` because antidev didn't wrap expressions in async context. Small, but the input was reasonable and antidev should have handled it — that's the kind of thing worth filing. Things less consequential than this, ignore.
 
 **NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
 
-**To file:** write `~/.gstack/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
+**To file:** write `~/.antidev/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
 
 ```
 # {Title}
 
-Hey gstack team — ran into this while using /{skill-name}:
+Hey antidev team — ran into this while using /{skill-name}:
 
 **What I was trying to do:** {what the user/agent was attempting}
 **What happened instead:** {what actually happened}
@@ -148,12 +148,12 @@ Hey gstack team — ran into this while using /{skill-name}:
 ```
 
 ## What would make this a 10
-{one sentence: what gstack should have done differently}
+{one sentence: what antidev should have done differently}
 
-**Date:** {YYYY-MM-DD} | **Version:** {gstack version} | **Skill:** /{skill}
+**Date:** {YYYY-MM-DD} | **Version:** {antidev version} | **Skill:** /{skill}
 ```
 
-Slug: lowercase, hyphens, max 60 chars (e.g. `browse-js-no-await`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed gstack field report: {title}"
+Slug: lowercase, hyphens, max 60 chars (e.g. `browse-js-no-await`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed antidev field report: {title}"
 
 ## Completion Status Protocol
 
@@ -190,8 +190,8 @@ if it failed, abort if the user interrupted). Run this bash:
 ```bash
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ~/.gstack/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.claude/skills/gstack/bin/gstack-telemetry-log \
+rm -f ~/.antidev/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
+~/.claude/skills/antidev/bin/antidev-telemetry-log \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```
@@ -212,8 +212,8 @@ You are a QA engineer. Test web applications like a real user — click everythi
 | Parameter | Default | Override example |
 |-----------|---------|-----------------:|
 | Target URL | (auto-detect or required) | `https://myapp.com`, `http://localhost:3000` |
-| Mode | full | `--quick`, `--regression .gstack/qa-reports/baseline.json` |
-| Output dir | `.gstack/qa-reports/` | `Output to /tmp/qa` |
+| Mode | full | `--quick`, `--regression .antidev/qa-reports/baseline.json` |
+| Output dir | `.antidev/qa-reports/` | `Output to /tmp/qa` |
 | Scope | Full app (or diff-scoped) | `Focus on the billing page` |
 | Auth | None | `Sign in to user@example.com`, `Import cookies from cookies.json` |
 
@@ -226,8 +226,8 @@ You are a QA engineer. Test web applications like a real user — click everythi
 ```bash
 _ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 B=""
-[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/gstack/browse/dist/browse" ] && B="$_ROOT/.claude/skills/gstack/browse/dist/browse"
-[ -z "$B" ] && B=~/.claude/skills/gstack/browse/dist/browse
+[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/antidev/browse/dist/browse" ] && B="$_ROOT/.claude/skills/antidev/browse/dist/browse"
+[ -z "$B" ] && B=~/.claude/skills/antidev/browse/dist/browse
 if [ -x "$B" ]; then
   echo "READY: $B"
 else
@@ -236,14 +236,14 @@ fi
 ```
 
 If `NEEDS_SETUP`:
-1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+1. Tell the user: "antidev browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
 
 **Create output directories:**
 
 ```bash
-REPORT_DIR=".gstack/qa-reports"
+REPORT_DIR=".antidev/qa-reports"
 mkdir -p "$REPORT_DIR/screenshots"
 ```
 
@@ -253,10 +253,10 @@ mkdir -p "$REPORT_DIR/screenshots"
 
 Before falling back to git diff heuristics, check for richer test plan sources:
 
-1. **Project-scoped test plans:** Check `~/.gstack/projects/` for recent `*-test-plan-*.md` files for this repo
+1. **Project-scoped test plans:** Check `~/.antidev/projects/` for recent `*-test-plan-*.md` files for this repo
    ```bash
-   source <(~/.claude/skills/gstack/bin/gstack-slug 2>/dev/null)
-   ls -t ~/.gstack/projects/$SLUG/*-test-plan-*.md 2>/dev/null | head -1
+   source <(~/.claude/skills/antidev/bin/antidev-slug 2>/dev/null)
+   ls -t ~/.antidev/projects/$SLUG/*-test-plan-*.md 2>/dev/null | head -1
    ```
 2. **Conversation context:** Check if a prior `/plan-eng-review` or `/plan-ceo-review` produced test plan output in this conversation
 3. **Use whichever source is richer.** Fall back to git diff analysis only if neither is available.
@@ -547,18 +547,18 @@ Minimum 0 per category.
 
 Write the report to both local and project-scoped locations:
 
-**Local:** `.gstack/qa-reports/qa-report-{domain}-{YYYY-MM-DD}.md`
+**Local:** `.antidev/qa-reports/qa-report-{domain}-{YYYY-MM-DD}.md`
 
 **Project-scoped:** Write test outcome artifact for cross-session context:
 ```bash
-source <(~/.claude/skills/gstack/bin/gstack-slug 2>/dev/null) && mkdir -p ~/.gstack/projects/$SLUG
+source <(~/.claude/skills/antidev/bin/antidev-slug 2>/dev/null) && mkdir -p ~/.antidev/projects/$SLUG
 ```
-Write to `~/.gstack/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
+Write to `~/.antidev/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
 
 ### Output Structure
 
 ```
-.gstack/qa-reports/
+.antidev/qa-reports/
 ├── qa-report-{domain}-{YYYY-MM-DD}.md    # Structured report
 ├── screenshots/
 │   ├── initial.png                        # Landing page annotated screenshot

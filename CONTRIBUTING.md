@@ -1,282 +1,281 @@
-# Contributing to gstack
+# Đóng góp cho gstack
 
-Thanks for wanting to make gstack better. Whether you're fixing a typo in a skill prompt or building an entirely new workflow, this guide will get you up and running fast.
+Cảm ơn bạn đã muốn cải thiện gstack. Dù bạn đang sửa lỗi đánh máy trong skill prompt hay xây dựng một quy trình hoàn toàn mới, hướng dẫn này sẽ giúp bạn bắt đầu nhanh chóng.
 
-## Quick start
+## Bắt đầu nhanh
 
-gstack skills are Markdown files that Claude Code discovers from a `skills/` directory. Normally they live at `~/.claude/skills/gstack/` (your global install). But when you're developing gstack itself, you want Claude Code to use the skills *in your working tree* — so edits take effect instantly without copying or deploying anything.
+gstack skill là các file Markdown mà Claude Code phát hiện từ thư mục `skills/`. Thường chúng nằm tại `~/.claude/skills/gstack/` (cài đặt toàn cục của bạn). Nhưng khi bạn đang phát triển gstack, bạn muốn Claude Code dùng các skill *trong working tree của bạn* — để các chỉnh sửa có hiệu lực ngay lập tức mà không cần copy hay deploy gì cả.
 
-That's what dev mode does. It symlinks your repo into the local `.claude/skills/` directory so Claude Code reads skills straight from your checkout.
+Đó là những gì dev mode làm. Nó symlink repo của bạn vào thư mục `.claude/skills/` cục bộ để Claude Code đọc skill thẳng từ checkout của bạn.
 
 ```bash
 git clone <repo> && cd gstack
-bun install                    # install dependencies
-bin/dev-setup                  # activate dev mode
+bun install                    # cài đặt dependencies
+bin/dev-setup                  # kích hoạt dev mode
 ```
 
-Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review`), and see your changes live. When you're done developing:
+Bây giờ chỉnh sửa bất kỳ `SKILL.md`, gọi nó trong Claude Code (ví dụ `/review`), và xem thay đổi của bạn trực tiếp. Khi bạn xong việc phát triển:
 
 ```bash
-bin/dev-teardown               # deactivate — back to your global install
+bin/dev-teardown               # tắt — quay lại cài đặt toàn cục
 ```
 
-## Contributor mode
+## Chế độ contributor
 
-Contributor mode turns gstack into a self-improving tool. Enable it and Claude Code
-will periodically reflect on its gstack experience — rating it 0-10 at the end of
-each major workflow step. When something isn't a 10, it thinks about why and files
-a report to `~/.gstack/contributor-logs/` with what happened, repro steps, and what
-would make it better.
+Chế độ contributor biến gstack thành công cụ tự cải thiện. Bật nó và Claude Code
+sẽ định kỳ phản ánh về trải nghiệm gstack của nó — đánh giá từ 0-10 ở cuối
+mỗi bước quy trình lớn. Khi điều gì đó không đạt 10, nó suy nghĩ về lý do và nộp
+báo cáo vào `~/.gstack/contributor-logs/` với những gì đã xảy ra, bước tái tạo, và những gì
+sẽ cải thiện nó.
 
 ```bash
 ~/.claude/skills/gstack/bin/gstack-config set gstack_contributor true
 ```
 
-The logs are for **you**. When something bugs you enough to fix, the report is
-already written. Fork gstack, symlink your fork into the project where you hit
-the issue, fix it, and open a PR.
+Các log là của **bạn**. Khi điều gì đó khó chịu đủ để sửa, báo cáo đã được viết sẵn.
+Fork gstack, symlink fork của bạn vào dự án nơi bạn gặp vấn đề, sửa nó, và mở PR.
 
-### The contributor workflow
+### Quy trình contributor
 
-1. **Use gstack normally** — contributor mode reflects and logs issues automatically
-2. **Check your logs:** `ls ~/.gstack/contributor-logs/`
-3. **Fork and clone gstack** (if you haven't already)
-4. **Symlink your fork into the project where you hit the bug:**
+1. **Dùng gstack bình thường** — chế độ contributor phản ánh và ghi log vấn đề tự động
+2. **Kiểm tra log của bạn:** `ls ~/.gstack/contributor-logs/`
+3. **Fork và clone gstack** (nếu bạn chưa làm)
+4. **Symlink fork của bạn vào dự án nơi bạn gặp lỗi:**
    ```bash
-   # In your core project (the one where gstack annoyed you)
+   # Trong dự án chính của bạn (cái khiến gstack làm phiền bạn)
    ln -sfn /path/to/your/gstack-fork .claude/skills/gstack
    cd .claude/skills/gstack && bun install && bun run build
    ```
-5. **Fix the issue** — your changes are live immediately in this project
-6. **Test by actually using gstack** — do the thing that annoyed you, verify it's fixed
-7. **Open a PR from your fork**
+5. **Sửa vấn đề** — các thay đổi của bạn có hiệu lực ngay lập tức trong dự án này
+6. **Kiểm tra bằng cách thực sự dùng gstack** — làm điều đã khó chịu bạn, xác minh nó đã được sửa
+7. **Mở PR từ fork của bạn**
 
-This is the best way to contribute: fix gstack while doing your real work, in the
-project where you actually felt the pain.
+Đây là cách tốt nhất để đóng góp: sửa gstack trong khi làm công việc thực sự, trong
+dự án nơi bạn thực sự cảm thấy nỗi đau.
 
-### Session awareness
+### Nhận thức phiên
 
-When you have 3+ gstack sessions open simultaneously, every question tells you which project, which branch, and what's happening. No more staring at a question thinking "wait, which window is this?" The format is consistent across all 15 skills.
+Khi bạn có 3+ phiên gstack mở đồng thời, mỗi câu hỏi cho bạn biết dự án nào, nhánh nào, và điều gì đang xảy ra. Không còn nhìn chằm chằm vào câu hỏi và nghĩ "chờ đã, đây là cửa sổ nào?" Định dạng nhất quán trên tất cả 15 skill.
 
-## Working on gstack inside the gstack repo
+## Làm việc trên gstack trong repo gstack
 
-When you're editing gstack skills and want to test them by actually using gstack
-in the same repo, `bin/dev-setup` wires this up. It creates `.claude/skills/`
-symlinks (gitignored) pointing back to your working tree, so Claude Code uses
-your local edits instead of the global install.
+Khi bạn đang chỉnh sửa gstack skill và muốn kiểm tra chúng bằng cách thực sự dùng gstack
+trong cùng repo, `bin/dev-setup` thiết lập điều này. Nó tạo `.claude/skills/`
+symlink (gitignored) trỏ lại working tree của bạn, vì vậy Claude Code dùng
+các chỉnh sửa cục bộ của bạn thay vì cài đặt toàn cục.
 
 ```
-gstack/                          <- your working tree
-├── .claude/skills/              <- created by dev-setup (gitignored)
-│   ├── gstack -> ../../         <- symlink back to repo root
+gstack/                          <- working tree của bạn
+├── .claude/skills/              <- được tạo bởi dev-setup (gitignored)
+│   ├── gstack -> ../../         <- symlink trỏ lại root repo
 │   ├── review -> gstack/review
 │   ├── ship -> gstack/ship
-│   └── ...                      <- one symlink per skill
+│   └── ...                      <- một symlink mỗi skill
 ├── review/
-│   └── SKILL.md                 <- edit this, test with /review
+│   └── SKILL.md                 <- chỉnh sửa cái này, test với /review
 ├── ship/
 │   └── SKILL.md
 ├── browse/
-│   ├── src/                     <- TypeScript source
-│   └── dist/                    <- compiled binary (gitignored)
+│   ├── src/                     <- nguồn TypeScript
+│   └── dist/                    <- binary đã biên dịch (gitignored)
 └── ...
 ```
 
-## Day-to-day workflow
+## Quy trình hàng ngày
 
 ```bash
-# 1. Enter dev mode
+# 1. Vào dev mode
 bin/dev-setup
 
-# 2. Edit a skill
+# 2. Chỉnh sửa một skill
 vim review/SKILL.md
 
-# 3. Test it in Claude Code — changes are live
+# 3. Kiểm tra trong Claude Code — các thay đổi có hiệu lực ngay
 #    > /review
 
-# 4. Editing browse source? Rebuild the binary
+# 4. Chỉnh sửa nguồn browse? Rebuild binary
 bun run build
 
-# 5. Done for the day? Tear down
+# 5. Xong ngày hôm nay? Tear down
 bin/dev-teardown
 ```
 
-## Testing & evals
+## Testing & eval
 
-### Setup
+### Cài đặt
 
 ```bash
-# 1. Copy .env.example and add your API key
+# 1. Copy .env.example và thêm API key của bạn
 cp .env.example .env
-# Edit .env → set ANTHROPIC_API_KEY=sk-ant-...
+# Chỉnh .env → đặt ANTHROPIC_API_KEY=sk-ant-...
 
-# 2. Install deps (if you haven't already)
+# 2. Cài đặt dependencies (nếu chưa làm)
 bun install
 ```
 
-Bun auto-loads `.env` — no extra config. Conductor workspaces inherit `.env` from the main worktree automatically (see "Conductor workspaces" below).
+Bun tự động tải `.env` — không cần cấu hình thêm. Conductor workspace kế thừa `.env` từ main worktree tự động (xem "Conductor workspace" bên dưới).
 
-### Test tiers
+### Các cấp độ test
 
-| Tier | Command | Cost | What it tests |
+| Cấp độ | Lệnh | Chi phí | Những gì nó test |
 |------|---------|------|---------------|
-| 1 — Static | `bun test` | Free | Command validation, snapshot flags, SKILL.md correctness, TODOS-format.md refs, observability unit tests |
-| 2 — E2E | `bun run test:e2e` | ~$3.85 | Full skill execution via `claude -p` subprocess |
-| 3 — LLM eval | `bun run test:evals` | ~$0.15 standalone | LLM-as-judge scoring of generated SKILL.md docs |
-| 2+3 | `bun run test:evals` | ~$4 combined | E2E + LLM-as-judge (runs both) |
+| 1 — Tĩnh | `bun test` | Miễn phí | Xác thực lệnh, snapshot flag, tính đúng đắn SKILL.md, tham chiếu TODOS-format.md, unit test quan sát |
+| 2 — E2E | `bun run test:e2e` | ~$3.85 | Thực thi skill đầy đủ qua subprocess `claude -p` |
+| 3 — LLM eval | `bun run test:evals` | ~$0.15 độc lập | Chấm điểm LLM-as-judge cho tài liệu SKILL.md được tạo ra |
+| 2+3 | `bun run test:evals` | ~$4 kết hợp | E2E + LLM-as-judge (chạy cả hai) |
 
 ```bash
-bun test                     # Tier 1 only (runs on every commit, <5s)
-bun run test:e2e             # Tier 2: E2E only (needs EVALS=1, can't run inside Claude Code)
-bun run test:evals           # Tier 2 + 3 combined (~$4/run)
+bun test                     # Chỉ Cấp độ 1 (chạy mỗi commit, <5s)
+bun run test:e2e             # Cấp độ 2: Chỉ E2E (cần EVALS=1, không thể chạy bên trong Claude Code)
+bun run test:evals           # Cấp độ 2 + 3 kết hợp (~$4/lần chạy)
 ```
 
-### Tier 1: Static validation (free)
+### Cấp độ 1: Xác thực tĩnh (miễn phí)
 
-Runs automatically with `bun test`. No API keys needed.
+Chạy tự động với `bun test`. Không cần API key.
 
-- **Skill parser tests** (`test/skill-parser.test.ts`) — Extracts every `$B` command from SKILL.md bash code blocks and validates against the command registry in `browse/src/commands.ts`. Catches typos, removed commands, and invalid snapshot flags.
-- **Skill validation tests** (`test/skill-validation.test.ts`) — Validates that SKILL.md files reference only real commands and flags, and that command descriptions meet quality thresholds.
-- **Generator tests** (`test/gen-skill-docs.test.ts`) — Tests the template system: verifies placeholders resolve correctly, output includes value hints for flags (e.g. `-d <N>` not just `-d`), enriched descriptions for key commands (e.g. `is` lists valid states, `press` lists key examples).
+- **Skill parser test** (`test/skill-parser.test.ts`) — Trích xuất mọi lệnh `$B` từ các khối code bash SKILL.md và xác thực so với registry lệnh trong `browse/src/commands.ts`. Phát hiện lỗi đánh máy, lệnh bị xóa, và snapshot flag không hợp lệ.
+- **Skill validation test** (`test/skill-validation.test.ts`) — Xác thực rằng các file SKILL.md chỉ tham chiếu các lệnh và flag thực, và mô tả lệnh đáp ứng ngưỡng chất lượng.
+- **Generator test** (`test/gen-skill-docs.test.ts`) — Test hệ thống template: xác minh placeholder được giải quyết đúng, output bao gồm gợi ý giá trị cho flag (ví dụ `-d <N>` chứ không phải chỉ `-d`), mô tả phong phú cho các lệnh quan trọng (ví dụ `is` liệt kê trạng thái hợp lệ, `press` liệt kê ví dụ key).
 
-### Tier 2: E2E via `claude -p` (~$3.85/run)
+### Cấp độ 2: E2E qua `claude -p` (~$3.85/lần chạy)
 
-Spawns `claude -p` as a subprocess with `--output-format stream-json --verbose`, streams NDJSON for real-time progress, and scans for browse errors. This is the closest thing to "does this skill actually work end-to-end?"
+Spawn `claude -p` như subprocess với `--output-format stream-json --verbose`, stream NDJSON cho tiến trình thời gian thực, và quét lỗi browse. Đây là điều gần nhất với "skill này có thực sự hoạt động end-to-end không?"
 
 ```bash
-# Must run from a plain terminal — can't nest inside Claude Code or Conductor
+# Phải chạy từ terminal thông thường — không thể lồng bên trong Claude Code hoặc Conductor
 EVALS=1 bun test test/skill-e2e.test.ts
 ```
 
-- Gated by `EVALS=1` env var (prevents accidental expensive runs)
-- Auto-skips if running inside Claude Code (`claude -p` can't nest)
-- API connectivity pre-check — fails fast on ConnectionRefused before burning budget
-- Real-time progress to stderr: `[Ns] turn T tool #C: Name(...)`
-- Saves full NDJSON transcripts and failure JSON for debugging
-- Tests live in `test/skill-e2e.test.ts`, runner logic in `test/helpers/session-runner.ts`
+- Được giới hạn bởi biến môi trường `EVALS=1` (ngăn chạy tốn tiền không chủ ý)
+- Tự động bỏ qua nếu đang chạy bên trong Claude Code (`claude -p` không thể lồng nhau)
+- Kiểm tra kết nối API trước — thất bại nhanh trên ConnectionRefused trước khi tốn ngân sách
+- Tiến trình thời gian thực đến stderr: `[Ns] turn T tool #C: Name(...)`
+- Lưu transcript NDJSON đầy đủ và JSON thất bại để debug
+- Test nằm trong `test/skill-e2e.test.ts`, logic runner trong `test/helpers/session-runner.ts`
 
-### E2E observability
+### Quan sát E2E
 
-When E2E tests run, they produce machine-readable artifacts in `~/.gstack-dev/`:
+Khi test E2E chạy, chúng tạo ra artifact đọc được bởi máy trong `~/.gstack-dev/`:
 
-| Artifact | Path | Purpose |
+| Artifact | Đường dẫn | Mục đích |
 |----------|------|---------|
-| Heartbeat | `e2e-live.json` | Current test status (updated per tool call) |
-| Partial results | `evals/_partial-e2e.json` | Completed tests (survives kills) |
-| Progress log | `e2e-runs/{runId}/progress.log` | Append-only text log |
-| NDJSON transcripts | `e2e-runs/{runId}/{test}.ndjson` | Raw `claude -p` output per test |
-| Failure JSON | `e2e-runs/{runId}/{test}-failure.json` | Diagnostic data on failure |
+| Heartbeat | `e2e-live.json` | Trạng thái test hiện tại (cập nhật mỗi tool call) |
+| Kết quả một phần | `evals/_partial-e2e.json` | Test đã hoàn thành (tồn tại sau kill) |
+| Log tiến trình | `e2e-runs/{runId}/progress.log` | Log text chỉ thêm |
+| Transcript NDJSON | `e2e-runs/{runId}/{test}.ndjson` | Output `claude -p` thô mỗi test |
+| JSON thất bại | `e2e-runs/{runId}/{test}-failure.json` | Dữ liệu chẩn đoán khi thất bại |
 
-**Live dashboard:** Run `bun run eval:watch` in a second terminal to see a live dashboard showing completed tests, the currently running test, and cost. Use `--tail` to also show the last 10 lines of progress.log.
+**Dashboard trực tiếp:** Chạy `bun run eval:watch` trong terminal thứ hai để xem dashboard trực tiếp hiển thị các test đã hoàn thành, test đang chạy, và chi phí. Dùng `--tail` để cũng hiển thị 10 dòng cuối của progress.log.
 
-**Eval history tools:**
-
-```bash
-bun run eval:list            # list all eval runs (turns, duration, cost per run)
-bun run eval:compare         # compare two runs — shows per-test deltas + Takeaway commentary
-bun run eval:summary         # aggregate stats + per-test efficiency averages across runs
-```
-
-**Eval comparison commentary:** `eval:compare` generates natural-language Takeaway sections interpreting what changed between runs — flagging regressions, noting improvements, calling out efficiency gains (fewer turns, faster, cheaper), and producing an overall summary. This is driven by `generateCommentary()` in `eval-store.ts`.
-
-Artifacts are never cleaned up — they accumulate in `~/.gstack-dev/` for post-mortem debugging and trend analysis.
-
-### Tier 3: LLM-as-judge (~$0.15/run)
-
-Uses Claude Sonnet to score generated SKILL.md docs on three dimensions:
-
-- **Clarity** — Can an AI agent understand the instructions without ambiguity?
-- **Completeness** — Are all commands, flags, and usage patterns documented?
-- **Actionability** — Can the agent execute tasks using only the information in the doc?
-
-Each dimension is scored 1-5. Threshold: every dimension must score **≥ 4**. There's also a regression test that compares generated docs against the hand-maintained baseline from `origin/main` — generated must score equal or higher.
+**Công cụ lịch sử eval:**
 
 ```bash
-# Needs ANTHROPIC_API_KEY in .env — included in bun run test:evals
+bun run eval:list            # liệt kê tất cả lần chạy eval (turn, thời gian, chi phí mỗi lần)
+bun run eval:compare         # so sánh hai lần chạy — hiển thị delta mỗi test + bình luận Takeaway
+bun run eval:summary         # thống kê tổng hợp + hiệu suất trung bình mỗi test qua các lần chạy
 ```
 
-- Uses `claude-sonnet-4-6` for scoring stability
-- Tests live in `test/skill-llm-eval.test.ts`
-- Calls the Anthropic API directly (not `claude -p`), so it works from anywhere including inside Claude Code
+**Bình luận so sánh eval:** `eval:compare` tạo ra các phần Takeaway bằng ngôn ngữ tự nhiên diễn giải những gì đã thay đổi giữa các lần chạy — gắn cờ hồi quy, ghi chú cải tiến, kêu gọi cải thiện hiệu quả (ít turn hơn, nhanh hơn, rẻ hơn), và tạo ra tóm tắt tổng thể. Điều này được điều khiển bởi `generateCommentary()` trong `eval-store.ts`.
+
+Artifact không bao giờ bị xóa — chúng tích lũy trong `~/.gstack-dev/` để debug post-mortem và phân tích xu hướng.
+
+### Cấp độ 3: LLM-as-judge (~$0.15/lần chạy)
+
+Dùng Claude Sonnet để chấm điểm tài liệu SKILL.md được tạo trên ba chiều:
+
+- **Rõ ràng** — AI agent có thể hiểu hướng dẫn mà không có sự mơ hồ không?
+- **Đầy đủ** — Tất cả lệnh, flag, và pattern sử dụng có được ghi lại không?
+- **Có thể thực thi** — Agent có thể thực hiện tác vụ chỉ dùng thông tin trong tài liệu không?
+
+Mỗi chiều được chấm từ 1-5. Ngưỡng: mỗi chiều phải đạt **≥ 4**. Còn có regression test so sánh tài liệu được tạo với baseline được duy trì thủ công từ `origin/main` — tài liệu được tạo phải đạt điểm bằng hoặc cao hơn.
+
+```bash
+# Cần ANTHROPIC_API_KEY trong .env — bao gồm trong bun run test:evals
+```
+
+- Dùng `claude-sonnet-4-6` cho tính ổn định chấm điểm
+- Test nằm trong `test/skill-llm-eval.test.ts`
+- Gọi API Anthropic trực tiếp (không phải `claude -p`), vì vậy hoạt động từ mọi nơi kể cả bên trong Claude Code
 
 ### CI
 
-A GitHub Action (`.github/workflows/skill-docs.yml`) runs `bun run gen:skill-docs --dry-run` on every push and PR. If the generated SKILL.md files differ from what's committed, CI fails. This catches stale docs before they merge.
+Một GitHub Action (`.github/workflows/skill-docs.yml`) chạy `bun run gen:skill-docs --dry-run` trên mỗi push và PR. Nếu các file SKILL.md được tạo khác với những gì đã commit, CI thất bại. Điều này phát hiện tài liệu cũ trước khi chúng merge.
 
-Tests run against the browse binary directly — they don't require dev mode.
+Test chạy với binary browse trực tiếp — chúng không yêu cầu dev mode.
 
-## Editing SKILL.md files
+## Chỉnh sửa file SKILL.md
 
-SKILL.md files are **generated** from `.tmpl` templates. Don't edit the `.md` directly — your changes will be overwritten on the next build.
+File SKILL.md được **tạo** từ template `.tmpl`. Đừng chỉnh sửa `.md` trực tiếp — các thay đổi của bạn sẽ bị ghi đè trong lần build tiếp theo.
 
 ```bash
-# 1. Edit the template
-vim SKILL.md.tmpl              # or browse/SKILL.md.tmpl
+# 1. Chỉnh sửa template
+vim SKILL.md.tmpl              # hoặc browse/SKILL.md.tmpl
 
-# 2. Regenerate
+# 2. Tạo lại
 bun run gen:skill-docs
 
-# 3. Check health
+# 3. Kiểm tra sức khỏe
 bun run skill:check
 
-# Or use watch mode — auto-regenerates on save
+# Hoặc dùng watch mode — tự động tạo lại khi lưu
 bun run dev:skill
 ```
 
-For template authoring best practices (natural language over bash-isms, dynamic branch detection, `{{BASE_BRANCH_DETECT}}` usage), see CLAUDE.md's "Writing SKILL templates" section.
+Để biết các phương pháp tốt nhất về soạn thảo template (ngôn ngữ tự nhiên thay vì bash-ism, phát hiện nhánh động, sử dụng `{{BASE_BRANCH_DETECT}}`), xem phần "Viết SKILL template" trong CLAUDE.md.
 
-To add a browse command, add it to `browse/src/commands.ts`. To add a snapshot flag, add it to `SNAPSHOT_FLAGS` in `browse/src/snapshot.ts`. Then rebuild.
+Để thêm lệnh browse, thêm nó vào `browse/src/commands.ts`. Để thêm snapshot flag, thêm nó vào `SNAPSHOT_FLAGS` trong `browse/src/snapshot.ts`. Sau đó rebuild.
 
-## Conductor workspaces
+## Conductor workspace
 
-If you're using [Conductor](https://conductor.build) to run multiple Claude Code sessions in parallel, `conductor.json` wires up workspace lifecycle automatically:
+Nếu bạn đang dùng [Conductor](https://conductor.build) để chạy nhiều phiên Claude Code song song, `conductor.json` kết nối vòng đời workspace tự động:
 
-| Hook | Script | What it does |
+| Hook | Script | Chức năng |
 |------|--------|-------------|
-| `setup` | `bin/dev-setup` | Copies `.env` from main worktree, installs deps, symlinks skills |
-| `archive` | `bin/dev-teardown` | Removes skill symlinks, cleans up `.claude/` directory |
+| `setup` | `bin/dev-setup` | Copy `.env` từ main worktree, cài dependencies, symlink skill |
+| `archive` | `bin/dev-teardown` | Xóa symlink skill, dọn dẹp thư mục `.claude/` |
 
-When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It detects the main worktree (via `git worktree list`), copies your `.env` so API keys carry over, and sets up dev mode — no manual steps needed.
+Khi Conductor tạo workspace mới, `bin/dev-setup` chạy tự động. Nó phát hiện main worktree (qua `git worktree list`), copy `.env` của bạn để API key được chuyển qua, và thiết lập dev mode — không cần bước thủ công.
 
-**First-time setup:** Put your `ANTHROPIC_API_KEY` in `.env` in the main repo (see `.env.example`). Every Conductor workspace inherits it automatically.
+**Cài đặt lần đầu:** Đặt `ANTHROPIC_API_KEY` của bạn trong `.env` trong repo chính (xem `.env.example`). Mỗi Conductor workspace kế thừa nó tự động.
 
-## Things to know
+## Những điều cần biết
 
-- **SKILL.md files are generated.** Edit the `.tmpl` template, not the `.md`. Run `bun run gen:skill-docs` to regenerate.
-- **TODOS.md is the unified backlog.** Organized by skill/component with P0-P4 priorities. `/ship` auto-detects completed items. All planning/review/retro skills read it for context.
-- **Browse source changes need a rebuild.** If you touch `browse/src/*.ts`, run `bun run build`.
-- **Dev mode shadows your global install.** Project-local skills take priority over `~/.claude/skills/gstack`. `bin/dev-teardown` restores the global one.
-- **Conductor workspaces are independent.** Each workspace is its own git worktree. `bin/dev-setup` runs automatically via `conductor.json`.
-- **`.env` propagates across worktrees.** Set it once in the main repo, all Conductor workspaces get it.
-- **`.claude/skills/` is gitignored.** The symlinks never get committed.
+- **File SKILL.md được tạo.** Chỉnh sửa template `.tmpl`, không phải `.md`. Chạy `bun run gen:skill-docs` để tạo lại.
+- **TODOS.md là backlog thống nhất.** Được tổ chức theo skill/component với độ ưu tiên P0-P4. `/ship` tự động phát hiện các mục đã hoàn thành. Tất cả skill lập kế hoạch/review/retro đọc nó để có ngữ cảnh.
+- **Thay đổi nguồn Browse cần rebuild.** Nếu bạn chạm vào `browse/src/*.ts`, chạy `bun run build`.
+- **Dev mode che khuất cài đặt toàn cục của bạn.** Skill cục bộ theo dự án có độ ưu tiên hơn `~/.claude/skills/gstack`. `bin/dev-teardown` khôi phục cái toàn cục.
+- **Conductor workspace là độc lập.** Mỗi workspace là git worktree riêng của nó. `bin/dev-setup` chạy tự động qua `conductor.json`.
+- **`.env` được lan truyền qua các worktree.** Đặt nó một lần trong repo chính, tất cả Conductor workspace có nó.
+- **`.claude/skills/` là gitignored.** Các symlink không bao giờ được commit.
 
-## Testing your changes in a real project
+## Testing các thay đổi của bạn trong dự án thực
 
-**This is the recommended way to develop gstack.** Symlink your gstack checkout
-into the project where you actually use it, so your changes are live while you
-do real work:
+**Đây là cách được khuyến nghị để phát triển gstack.** Symlink checkout gstack của bạn
+vào dự án nơi bạn thực sự dùng nó, để các thay đổi của bạn có hiệu lực trong khi bạn
+làm công việc thực:
 
 ```bash
-# In your core project
+# Trong dự án chính của bạn
 ln -sfn /path/to/your/gstack-checkout .claude/skills/gstack
 cd .claude/skills/gstack && bun install && bun run build
 ```
 
-Now every gstack skill invocation in this project uses your working tree. Edit a
-template, run `bun run gen:skill-docs`, and the next `/review` or `/qa` call picks
-it up immediately.
+Bây giờ mọi lần gọi gstack skill trong dự án này dùng working tree của bạn. Chỉnh sửa một
+template, chạy `bun run gen:skill-docs`, và lần gọi `/review` hoặc `/qa` tiếp theo nhận nó
+ngay lập tức.
 
-**To go back to the stable global install**, just remove the symlink:
+**Để quay lại cài đặt toàn cục ổn định**, chỉ cần xóa symlink:
 
 ```bash
 rm .claude/skills/gstack
 ```
 
-Claude Code falls back to `~/.claude/skills/gstack/` automatically.
+Claude Code tự động quay lại `~/.claude/skills/gstack/`.
 
-### Alternative: point your global install at a branch
+### Thay thế: trỏ cài đặt toàn cục của bạn vào một nhánh
 
-If you don't want per-project symlinks, you can switch the global install:
+Nếu bạn không muốn symlink theo từng dự án, bạn có thể chuyển cài đặt toàn cục:
 
 ```bash
 cd ~/.claude/skills/gstack
@@ -285,14 +284,14 @@ git checkout origin/<branch>
 bun install && bun run build
 ```
 
-This affects all projects. To revert: `git checkout main && git pull && bun run build`.
+Điều này ảnh hưởng đến tất cả dự án. Để hoàn tác: `git checkout main && git pull && bun run build`.
 
-## Shipping your changes
+## Ship các thay đổi của bạn
 
-When you're happy with your skill edits:
+Khi bạn hài lòng với các chỉnh sửa skill của mình:
 
 ```bash
 /ship
 ```
 
-This runs tests, reviews the diff, triages Greptile comments (with 2-tier escalation), manages TODOS.md, bumps the version, and opens a PR. See `ship/SKILL.md` for the full workflow.
+Lệnh này chạy test, review diff, phân loại comment Greptile (với leo thang 2 cấp), quản lý TODOS.md, tăng phiên bản, và mở PR. Xem `ship/SKILL.md` để biết quy trình đầy đủ.

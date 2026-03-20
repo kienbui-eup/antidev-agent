@@ -422,7 +422,7 @@
 
 **Effort:** S
 **Priority:** P2
-**Depends on:** `garrytan/team-supabase-store` branch landing on main
+**Depends on:** `KienBui-eup/team-supabase-store` branch landing on main
 
 ### /yc-prep skill
 

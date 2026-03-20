@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
-# gstack-telemetry-log — append a telemetry event to local JSONL
+# antidev-telemetry-log — append a telemetry event to local JSONL
 #
 # Data flow:
 #   preamble (start) ──▶ .pending marker
-#   preamble (epilogue) ──▶ gstack-telemetry-log ──▶ skill-usage.jsonl
-#                                                 └──▶ gstack-telemetry-sync (bg)
+#   preamble (epilogue) ──▶ antidev-telemetry-log ──▶ skill-usage.jsonl
+#                                                 └──▶ antidev-telemetry-sync (bg)
 #
 # Usage:
-#   gstack-telemetry-log --skill qa --duration 142 --outcome success \
+#   antidev-telemetry-log --skill qa --duration 142 --outcome success \
 #     --used-browse true --session-id "12345-1710756600"
 #
 # Env overrides (for testing):
-#   GSTACK_STATE_DIR  — override ~/.gstack state directory
-#   GSTACK_DIR        — override auto-detected gstack root
+#   ANTIDEV_STATE_DIR  — override ~/.antidev state directory
+#   ANTIDEV_DIR        — override auto-detected antidev root
 #
 # NOTE: Uses set -uo pipefail (no -e) — telemetry must never exit non-zero
 set -uo pipefail
 
-GSTACK_DIR="${GSTACK_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-STATE_DIR="${GSTACK_STATE_DIR:-$HOME/.gstack}"
+ANTIDEV_DIR="${ANTIDEV_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+STATE_DIR="${ANTIDEV_STATE_DIR:-$HOME/.antidev}"
 ANALYTICS_DIR="$STATE_DIR/analytics"
 JSONL_FILE="$ANALYTICS_DIR/skill-usage.jsonl"
 PENDING_DIR="$ANALYTICS_DIR"  # .pending-* files live here
-CONFIG_CMD="$GSTACK_DIR/bin/gstack-config"
-VERSION_FILE="$GSTACK_DIR/VERSION"
+CONFIG_CMD="$ANTIDEV_DIR/bin/antidev-config"
+VERSION_FILE="$ANTIDEV_DIR/VERSION"
 
 # ─── Parse flags ─────────────────────────────────────────────
 SKILL=""
@@ -80,13 +80,13 @@ for PFILE in "$PENDING_DIR"/.pending-*; do
     P_SKILL="$(echo "$PENDING_DATA" | grep -o '"skill":"[^"]*"' | head -1 | awk -F'"' '{print $4}')"
     P_TS="$(echo "$PENDING_DATA" | grep -o '"ts":"[^"]*"' | head -1 | awk -F'"' '{print $4}')"
     P_SID="$(echo "$PENDING_DATA" | grep -o '"session_id":"[^"]*"' | head -1 | awk -F'"' '{print $4}')"
-    P_VER="$(echo "$PENDING_DATA" | grep -o '"gstack_version":"[^"]*"' | head -1 | awk -F'"' '{print $4}')"
+    P_VER="$(echo "$PENDING_DATA" | grep -o '"antidev_version":"[^"]*"' | head -1 | awk -F'"' '{print $4}')"
     P_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
     P_ARCH="$(uname -m)"
 
     # Write the stale event as outcome: unknown
     mkdir -p "$ANALYTICS_DIR"
-    printf '{"v":1,"ts":"%s","event_type":"skill_run","skill":"%s","session_id":"%s","gstack_version":"%s","os":"%s","arch":"%s","duration_s":null,"outcome":"unknown","error_class":null,"used_browse":false,"sessions":1}\n' \
+    printf '{"v":1,"ts":"%s","event_type":"skill_run","skill":"%s","session_id":"%s","antidev_version":"%s","os":"%s","arch":"%s","duration_s":null,"outcome":"unknown","error_class":null,"used_browse":false,"sessions":1}\n' \
       "$P_TS" "$P_SKILL" "$P_SID" "$P_VER" "$P_OS" "$P_ARCH" >> "$JSONL_FILE" 2>/dev/null || true
   fi
 done
@@ -96,7 +96,7 @@ done
 
 # ─── Collect metadata ────────────────────────────────────────
 TS="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%S 2>/dev/null || echo "")"
-GSTACK_VERSION="$(cat "$VERSION_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
+ANTIDEV_VERSION="$(cat "$VERSION_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m)"
 SESSIONS="1"
@@ -144,13 +144,13 @@ INSTALL_FIELD="null"
 BROWSE_BOOL="false"
 [ "$USED_BROWSE" = "true" ] && BROWSE_BOOL="true"
 
-printf '{"v":1,"ts":"%s","event_type":"%s","skill":"%s","session_id":"%s","gstack_version":"%s","os":"%s","arch":"%s","duration_s":%s,"outcome":"%s","error_class":%s,"used_browse":%s,"sessions":%s,"installation_id":%s,"_repo_slug":"%s","_branch":"%s"}\n' \
-  "$TS" "$EVENT_TYPE" "$SKILL" "$SESSION_ID" "$GSTACK_VERSION" "$OS" "$ARCH" \
+printf '{"v":1,"ts":"%s","event_type":"%s","skill":"%s","session_id":"%s","antidev_version":"%s","os":"%s","arch":"%s","duration_s":%s,"outcome":"%s","error_class":%s,"used_browse":%s,"sessions":%s,"installation_id":%s,"_repo_slug":"%s","_branch":"%s"}\n' \
+  "$TS" "$EVENT_TYPE" "$SKILL" "$SESSION_ID" "$ANTIDEV_VERSION" "$OS" "$ARCH" \
   "$DUR_FIELD" "$OUTCOME" "$ERR_FIELD" "$BROWSE_BOOL" "${SESSIONS:-1}" \
   "$INSTALL_FIELD" "$REPO_SLUG" "$BRANCH" >> "$JSONL_FILE" 2>/dev/null || true
 
 # ─── Trigger sync if tier is not off ─────────────────────────
-SYNC_CMD="$GSTACK_DIR/bin/gstack-telemetry-sync"
+SYNC_CMD="$ANTIDEV_DIR/bin/antidev-telemetry-sync"
 if [ -x "$SYNC_CMD" ]; then
   "$SYNC_CMD" 2>/dev/null &
 fi

@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
-# gstack-telemetry-sync — sync local JSONL events to Supabase
+# antidev-telemetry-sync — sync local JSONL events to Supabase
 #
 # Fire-and-forget, backgrounded, rate-limited to once per 5 minutes.
 # Strips local-only fields before sending. Respects privacy tiers.
 #
 # Env overrides (for testing):
-#   GSTACK_STATE_DIR           — override ~/.gstack state directory
-#   GSTACK_DIR                 — override auto-detected gstack root
-#   GSTACK_TELEMETRY_ENDPOINT  — override Supabase endpoint URL
+#   ANTIDEV_STATE_DIR           — override ~/.antidev state directory
+#   ANTIDEV_DIR                 — override auto-detected antidev root
+#   ANTIDEV_TELEMETRY_ENDPOINT  — override Supabase endpoint URL
 set -uo pipefail
 
-GSTACK_DIR="${GSTACK_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-STATE_DIR="${GSTACK_STATE_DIR:-$HOME/.gstack}"
+ANTIDEV_DIR="${ANTIDEV_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+STATE_DIR="${ANTIDEV_STATE_DIR:-$HOME/.antidev}"
 ANALYTICS_DIR="$STATE_DIR/analytics"
 JSONL_FILE="$ANALYTICS_DIR/skill-usage.jsonl"
 CURSOR_FILE="$ANALYTICS_DIR/.last-sync-line"
 RATE_FILE="$ANALYTICS_DIR/.last-sync-time"
-CONFIG_CMD="$GSTACK_DIR/bin/gstack-config"
+CONFIG_CMD="$ANTIDEV_DIR/bin/antidev-config"
 
 # Source Supabase config if not overridden by env
-if [ -z "${GSTACK_TELEMETRY_ENDPOINT:-}" ] && [ -f "$GSTACK_DIR/supabase/config.sh" ]; then
-  . "$GSTACK_DIR/supabase/config.sh"
+if [ -z "${ANTIDEV_TELEMETRY_ENDPOINT:-}" ] && [ -f "$ANTIDEV_DIR/supabase/config.sh" ]; then
+  . "$ANTIDEV_DIR/supabase/config.sh"
 fi
-ENDPOINT="${GSTACK_TELEMETRY_ENDPOINT:-}"
-ANON_KEY="${GSTACK_SUPABASE_ANON_KEY:-}"
+ENDPOINT="${ANTIDEV_TELEMETRY_ENDPOINT:-}"
+ANON_KEY="${ANTIDEV_SUPABASE_ANON_KEY:-}"
 
 # ─── Pre-checks ──────────────────────────────────────────────
 # No endpoint configured yet → exit silently

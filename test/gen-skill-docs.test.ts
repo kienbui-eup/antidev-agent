@@ -58,7 +58,7 @@ describe('gen-skill-docs', () => {
 
   // All skills that must have templates — single source of truth
   const ALL_SKILLS = [
-    { dir: '.', name: 'root gstack' },
+    { dir: '.', name: 'root antidev' },
     { dir: 'browse', name: 'browse' },
     { dir: 'qa', name: 'qa' },
     { dir: 'qa-only', name: 'qa-only' },
@@ -68,7 +68,7 @@ describe('gen-skill-docs', () => {
     { dir: 'plan-eng-review', name: 'plan-eng-review' },
     { dir: 'retro', name: 'retro' },
     { dir: 'setup-browser-cookies', name: 'setup-browser-cookies' },
-    { dir: 'gstack-upgrade', name: 'gstack-upgrade' },
+    { dir: 'antidev-upgrade', name: 'antidev-upgrade' },
     { dir: 'plan-design-review', name: 'plan-design-review' },
     { dir: 'design-review', name: 'design-review' },
     { dir: 'design-consultation', name: 'design-consultation' },
@@ -144,7 +144,7 @@ describe('gen-skill-docs', () => {
   test('generated SKILL.md contains contributor mode check', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
     expect(content).toContain('Contributor Mode');
-    expect(content).toContain('gstack_contributor');
+    expect(content).toContain('antidev_contributor');
     expect(content).toContain('contributor-logs');
   });
 
@@ -169,12 +169,12 @@ describe('gen-skill-docs', () => {
   test('generated SKILL.md contains telemetry line', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
     expect(content).toContain('skill-usage.jsonl');
-    expect(content).toContain('~/.gstack/analytics');
+    expect(content).toContain('~/.antidev/analytics');
   });
 
   test('preamble-using skills have correct skill name in telemetry', () => {
     const PREAMBLE_SKILLS = [
-      { dir: '.', name: 'gstack' },
+      { dir: '.', name: 'antidev' },
       { dir: 'ship', name: 'ship' },
       { dir: 'review', name: 'review' },
       { dir: 'qa', name: 'qa' },
@@ -354,7 +354,7 @@ describe('REVIEW_DASHBOARD resolver', () => {
   for (const skill of REVIEW_SKILLS) {
     test(`review dashboard appears in ${skill} generated file`, () => {
       const content = fs.readFileSync(path.join(ROOT, skill, 'SKILL.md'), 'utf-8');
-      expect(content).toContain('gstack-review');
+      expect(content).toContain('antidev-review');
       expect(content).toContain('REVIEW READINESS DASHBOARD');
     });
   }
@@ -430,21 +430,21 @@ describe('telemetry', () => {
     expect(content).toContain('_SESSION_ID');
     expect(content).toContain('TELEMETRY:');
     expect(content).toContain('TEL_PROMPTED:');
-    expect(content).toContain('gstack-config get telemetry');
+    expect(content).toContain('antidev-config get telemetry');
   });
 
   test('generated SKILL.md contains telemetry opt-in prompt', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
     expect(content).toContain('.telemetry-prompted');
     expect(content).toContain('anonymous usage data');
-    expect(content).toContain('gstack-config set telemetry anonymous');
-    expect(content).toContain('gstack-config set telemetry off');
+    expect(content).toContain('antidev-config set telemetry anonymous');
+    expect(content).toContain('antidev-config set telemetry off');
   });
 
   test('generated SKILL.md contains telemetry epilogue', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
     expect(content).toContain('Telemetry (run last)');
-    expect(content).toContain('gstack-telemetry-log');
+    expect(content).toContain('antidev-telemetry-log');
     expect(content).toContain('_TEL_END');
     expect(content).toContain('_TEL_DUR');
     expect(content).toContain('SKILL_NAME');

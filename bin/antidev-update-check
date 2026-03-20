@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# gstack-update-check — periodic version check for all skills.
+# antidev-update-check — periodic version check for all skills.
 #
 # Output (one line, or nothing):
 #   JUST_UPGRADED <old> <new>       — marker found from recent upgrade
@@ -7,26 +7,26 @@
 #   (nothing)                       — up to date, snoozed, disabled, or check skipped
 #
 # Env overrides (for testing):
-#   GSTACK_DIR          — override auto-detected gstack root
-#   GSTACK_REMOTE_URL   — override remote VERSION URL
-#   GSTACK_STATE_DIR    — override ~/.gstack state directory
+#   ANTIDEV_DIR          — override auto-detected antidev root
+#   ANTIDEV_REMOTE_URL   — override remote VERSION URL
+#   ANTIDEV_STATE_DIR    — override ~/.antidev state directory
 set -euo pipefail
 
-GSTACK_DIR="${GSTACK_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-STATE_DIR="${GSTACK_STATE_DIR:-$HOME/.gstack}"
+ANTIDEV_DIR="${ANTIDEV_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+STATE_DIR="${ANTIDEV_STATE_DIR:-$HOME/.antidev}"
 CACHE_FILE="$STATE_DIR/last-update-check"
 MARKER_FILE="$STATE_DIR/just-upgraded-from"
 SNOOZE_FILE="$STATE_DIR/update-snoozed"
-VERSION_FILE="$GSTACK_DIR/VERSION"
-REMOTE_URL="${GSTACK_REMOTE_URL:-https://raw.githubusercontent.com/garrytan/gstack/main/VERSION}"
+VERSION_FILE="$ANTIDEV_DIR/VERSION"
+REMOTE_URL="${ANTIDEV_REMOTE_URL:-https://raw.githubusercontent.com/garrytan/antidev/main/VERSION}"
 
-# ─── Force flag (busts cache for standalone /gstack-upgrade) ──
+# ─── Force flag (busts cache for standalone /antidev-upgrade) ──
 if [ "${1:-}" = "--force" ]; then
   rm -f "$CACHE_FILE"
 fi
 
 # ─── Step 0: Check if updates are disabled ────────────────────
-_UC=$("$GSTACK_DIR/bin/gstack-config" get update_check 2>/dev/null || true)
+_UC=$("$ANTIDEV_DIR/bin/antidev-config" get update_check 2>/dev/null || true)
 if [ "$_UC" = "false" ]; then
   exit 0
 fi
@@ -144,13 +144,13 @@ mkdir -p "$STATE_DIR"
 # This logs an update check event for community health metrics.
 # If the endpoint isn't configured or Supabase is down, this is a no-op.
 # Source Supabase config for install ping
-if [ -z "${GSTACK_TELEMETRY_ENDPOINT:-}" ] && [ -f "$GSTACK_DIR/supabase/config.sh" ]; then
-  . "$GSTACK_DIR/supabase/config.sh"
+if [ -z "${ANTIDEV_TELEMETRY_ENDPOINT:-}" ] && [ -f "$ANTIDEV_DIR/supabase/config.sh" ]; then
+  . "$ANTIDEV_DIR/supabase/config.sh"
 fi
-_SUPA_ENDPOINT="${GSTACK_TELEMETRY_ENDPOINT:-}"
-_SUPA_KEY="${GSTACK_SUPABASE_ANON_KEY:-}"
+_SUPA_ENDPOINT="${ANTIDEV_TELEMETRY_ENDPOINT:-}"
+_SUPA_KEY="${ANTIDEV_SUPABASE_ANON_KEY:-}"
 # Respect telemetry opt-out — don't ping Supabase if user set telemetry: off
-_TEL_TIER="$("$GSTACK_DIR/bin/gstack-config" get telemetry 2>/dev/null || true)"
+_TEL_TIER="$("$ANTIDEV_DIR/bin/antidev-config" get telemetry 2>/dev/null || true)"
 if [ -n "$_SUPA_ENDPOINT" ] && [ -n "$_SUPA_KEY" ] && [ "${_TEL_TIER:-off}" != "off" ]; then
   _OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
   curl -sf --max-time 5 \
@@ -159,7 +159,7 @@ if [ -n "$_SUPA_ENDPOINT" ] && [ -n "$_SUPA_KEY" ] && [ "${_TEL_TIER:-off}" != "
     -H "apikey: ${_SUPA_KEY}" \
     -H "Authorization: Bearer ${_SUPA_KEY}" \
     -H "Prefer: return=minimal" \
-    -d "{\"gstack_version\":\"$LOCAL\",\"os\":\"$_OS\"}" \
+    -d "{\"antidev_version\":\"$LOCAL\",\"os\":\"$_OS\"}" \
     >/dev/null 2>&1 &
 fi
 
@@ -187,7 +187,7 @@ if check_snooze "$REMOTE"; then
 fi
 
 # Log upgrade_prompted event (only on slow-path fetch, not cached replays)
-TEL_CMD="$GSTACK_DIR/bin/gstack-telemetry-log"
+TEL_CMD="$ANTIDEV_DIR/bin/antidev-telemetry-log"
 if [ -x "$TEL_CMD" ]; then
   "$TEL_CMD" --event-type upgrade_prompted --skill "" --duration 0 \
     --outcome success --session-id "update-$$-$(date +%s)" 2>/dev/null &

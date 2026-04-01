@@ -1,0 +1,271 @@
+stages:
+  - validate
+  - test
+  - build
+  - deploy
+
+include:
+  - local: .gitlab/ci/skill-docs.yml
+
+variables:
+  FF_USE_FASTZIP: "true"
+  CACHE_COMPRESSION_LEVEL: "fastest"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}-bun
+  paths:
+    - node_modules/
+    - .bun/
+
+# Stage 1: Validate
+validate:lint:
+  stage: validate
+  image: oven/bun:latest
+  script:
+    - echo "🔍 Validating TypeScript & code style..."
+    - bun install --frozen-lockfile
+    - bun run skill:check
+  allow_failure: false
+  only:
+    - merge_requests
+    - main
+    - develop
+
+validate:skill-docs:
+  stage: validate
+  image: oven/bun:latest
+  script:
+    - echo "📚 Checking SKILL.md freshness vs .tmpl files..."
+    - bun install --frozen-lockfile
+    - bun run gen:skill-docs --dry-run
+  allow_failure: false
+  only:
+    - merge_requests
+    - main
+
+validate:touchfiles:
+  stage: validate
+  image: oven/bun:latest
+  script:
+    - echo "📋 Validating test touchfiles..."
+    - bun install --frozen-lockfile
+    - bun run test -- test/touchfiles.test.ts
+  allow_failure: false
+  only:
+    - merge_requests
+
+validate:jira-config:
+  stage: validate
+  image: oven/bun:latest
+  script:
+    - echo "🔗 Checking Jira configuration..."
+    - |
+      if [ -n "${JIRA_HOST:-}" ]; then
+        if [ -z "${JIRA_EMAIL:-}" ] || [ -z "${JIRA_API_TOKEN:-}" ]; then
+          echo "⚠️  JIRA_HOST is set but JIRA_EMAIL or JIRA_API_TOKEN is missing."
+          echo "   Set all three CI/CD variables for Jira auto-linking to work."
+          exit 1
+        fi
+        echo "✅ Jira config: JIRA_HOST=$JIRA_HOST (credentials present)"
+      else
+        echo "ℹ️  JIRA_HOST not set — Jira integration disabled."
+      fi
+  allow_failure: true
+  only:
+    - merge_requests
+    - main
+
+validate:code-style:
+  stage: validate
+  image: oven/bun:latest
+  script:
+    - echo "🧹 Running ESLint + Prettier checks..."
+    - bun install --frozen-lockfile
+    - bun run lint
+    - bun run format:check
+  allow_failure: true
+  only:
+    - merge_requests
+    - main
+
+# Stage 2: Test (Diff-based selection to avoid $56+ spend)
+test:free:
+  stage: test
+  image: oven/bun:latest
+  script:
+    - echo "✅ Running free tests (validation + integration)..."
+    - bun install --frozen-lockfile
+    - bun test browse/test/ test/ --ignore test/skill-e2e.test.ts --ignore test/skill-llm-eval.test.ts --ignore test/skill-routing-e2e.test.ts
+  coverage: '/Coverage: \d+\.\d+%/'
+  only:
+    - merge_requests
+    - main
+
+test:e2e:
+  stage: test
+  image: oven/bun:latest
+  script:
+    - echo "🌐 Running E2E tests (diff-based selection)..."
+    - bun install --frozen-lockfile
+    - export EVALS=1
+    - |
+      # Check if changes affect E2E tests
+      if git diff ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-main} --name-only | grep -E "(browse|test|skills)" > /dev/null; then
+        echo "Changes detected, running E2E..."
+        bun test test/skill-e2e.test.ts test/skill-routing-e2e.test.ts
+      else
+        echo "No relevant changes, skipping E2E"
+      fi
+  allow_failure: true
+  only:
+    - merge_requests
+  artifacts:
+    paths:
+      - ~/.antidev-dev/evals/
+    expire_in: 30 days
+
+test:llm-eval:
+  stage: test
+  image: oven/bun:latest
+  script:
+    - echo "🧠 Running LLM evaluations (diff-based selection)..."
+    - bun install --frozen-lockfile
+    - export EVALS=1
+    - export ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    - |
+      # Check if skill changes warrant full eval
+      if git diff ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-main} --name-only | grep -E "(SKILL\.md\.tmpl|skill-llm-eval)" > /dev/null; then
+        echo "Skill changes detected, running full LLM eval..."
+        bun test test/skill-llm-eval.test.ts
+      else
+        echo "No skill changes, skipping LLM eval"
+      fi
+  allow_failure: true
+  only:
+    - merge_requests
+  artifacts:
+    paths:
+      - ~/.antidev-dev/evals/
+    expire_in: 30 days
+
+test:full:nightly:
+  stage: test
+  image: oven/bun:latest
+  script:
+    - echo "🌙 Running full test suite (nightly)..."
+    - bun install --frozen-lockfile
+    - export EVALS=1 EVALS_ALL=1
+    - export ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    - bun run test:evals:all
+  allow_failure: true
+  only:
+    - schedules
+  artifacts:
+    paths:
+      - ~/.antidev-dev/evals/
+    expire_in: 30 days
+
+# Stage 3: Build
+build:binary:
+  stage: build
+  image: oven/bun:latest
+  script:
+    - echo "🔨 Building antidev binary..."
+    - bun install --frozen-lockfile
+    - bun run build
+    - echo "✅ Binary compressed to $(du -h browse/dist/browse | cut -f1)"
+  artifacts:
+    paths:
+      - browse/dist/browse
+      - browse/dist/find-browse
+      - browse/dist/.version
+    expire_in: 1 day
+  only:
+    - main
+    - develop
+    - /^v\d+\.\d+\.\d+$/
+
+build:docs:
+  stage: build
+  image: oven/bun:latest
+  script:
+    - echo "📖 Regenerating documentation..."
+    - bun install --frozen-lockfile
+    - bun run gen:skill-docs
+  artifacts:
+    paths:
+      - "*/SKILL.md"
+      - "SKILL.md"
+    expire_in: 1 day
+  only:
+    - main
+
+# Stage 4: Deploy
+deploy:release:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo "🚀 Creating GitLab Release for $CI_COMMIT_TAG..."
+    - |
+      CHANGELOG_ENTRY=$(sed -n "/^## \[$CI_COMMIT_TAG\]/,/^## \[/p" CHANGELOG.md | head -50 | head -n -1 | tail -n +2)
+      echo "Changelog: $CHANGELOG_ENTRY"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: "Release $CI_COMMIT_TAG"
+    description: |
+      ## Changes
+      See [CHANGELOG.md](CHANGELOG.md) for details.
+
+      ## Install
+      ```bash
+      # macOS / Linux
+      curl -fsSL https://gitlab.com/eup/antidev-agent/-/raw/main/setup | bash
+      ```
+
+      Or download the binary directly from the release assets below.
+    assets:
+      links:
+        - name: "antidev binary (macOS/Linux)"
+          url: "${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_TAG}/raw/browse/dist/browse?job=build:binary"
+          link_type: package
+  needs:
+    - build:binary
+  only:
+    - tags
+  when: manual
+
+deploy:notify:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        echo "📢 Notifying Slack..."
+        curl -X POST $SLACK_WEBHOOK \
+          -H 'Content-Type: application/json' \
+          -d "{
+            \"text\": \"✅ antidev build successful\",
+            \"blocks\": [{
+              \"type\": \"section\",
+              \"text\": {
+                \"type\": \"mrkdwn\",
+                \"text\": \"*antidev Build Successful*\n\nCommit: ${CI_COMMIT_SHA:0:8}\nBranch: ${CI_COMMIT_BRANCH}\nAuthor: ${CI_COMMIT_AUTHOR}\"
+              }
+            }]
+          }"
+      fi
+  only:
+    - main
+  when: on_success
+  allow_failure: true
+
+# Scheduled jobs
+scheduled:backup:
+  stage: test
+  image: alpine:latest
+  script:
+    - echo "💾 Scheduled backup of eval results..."
+    # Add backup logic here
+  only:
+    - schedules
+  allow_failure: true

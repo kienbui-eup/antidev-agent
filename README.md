@@ -8,8 +8,6 @@ Trong những tháng gần đây, tôi đã viết **hàng trăm nghìn dòng co
 
 **2026 — đóng góp liên tục:**
 
-![GitHub contributions 2026](docs/images/github-2026.png)
-
 **antidev là cách tôi làm điều đó.** Đây là nhà máy phần mềm mã nguồn mở của tôi. Nó biến Claude Code thành một đội kỹ thuật ảo mà bạn thực sự quản lý — một CEO suy nghĩ lại về sản phẩm, một eng manager khóa kiến trúc, một designer phát hiện AI slop, một reviewer cẩn thận tìm lỗi production, một QA lead mở browser thực và click qua ứng dụng của bạn, và một release engineer ship PR. Mười lăm chuyên gia và sáu công cụ mạnh mẽ, tất cả là slash command, tất cả là Markdown, **tất cả miễn phí, MIT license, có sẵn ngay bây giờ.**
 
 Tôi đang học cách đến giới hạn của những gì các hệ thống agentic có thể làm vào tháng 3 năm 2026, và đây là thí nghiệm trực tiếp của tôi. Tôi chia sẻ nó vì tôi muốn cả thế giới cùng đồng hành với tôi.
@@ -20,6 +18,23 @@ Fork nó. Cải thiện nó. Làm cho nó của bạn. Đừng ganh tị, hãy t
 - **Người sáng lập và CEO** — đặc biệt là những người kỹ thuật vẫn muốn ship. Đây là cách bạn xây dựng như một đội hai mươi người.
 - **Người dùng Claude Code lần đầu** — antidev là cách tốt nhất để bắt đầu. Các vai trò có cấu trúc thay vì một prompt trống.
 - **Tech lead và staff engineer** — mang đến review nghiêm ngặt, QA và tự động hóa release cho mọi PR
+
+---
+
+## Mục lục
+- [Bắt đầu nhanh: 10 phút đầu tiên của bạn](#bắt-đầu-nhanh-10-phút-đầu-tiên-của-bạn)
+- [Cài đặt — mất 30 giây](#cài-đặt--mất-30-giây)
+- [Xem nó hoạt động](#xem-nó-hoạt-động)
+- [Sprint](#sprint)
+- [Tính năng mới và tại sao chúng quan trọng](#tính-năng-mới-và-tại-sao-chúng-quan-trọng)
+- [10-15 sprint song song](#10-15-sprint-song-song)
+- [Cùng đón sóng](#cùng-đón-sóng)
+- [Tài liệu](#tài-liệu)
+- [Quyền riêng tư & Telemetry](#quyền-riêng-tư--telemetry)
+- [Khắc phục sự cố](#khắc-phục-sự-cố)
+- [Giấy phép](#giấy-phép)
+
+---
 
 ## Bắt đầu nhanh: 10 phút đầu tiên của bạn
 

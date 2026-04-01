@@ -1,0 +1,23 @@
+# Skill Docs Freshness Check
+# Migrated from .github/workflows/skill-docs.yml
+# Ensures SKILL.md files are always in sync with their .tmpl templates.
+
+validate:skill-docs-strict:
+  stage: validate
+  image: oven/bun:latest
+  script:
+    - echo "📚 Checking SKILL.md files are in sync with .tmpl templates..."
+    - bun install --frozen-lockfile
+    - bun run gen:skill-docs
+    - |
+      if ! git diff --exit-code; then
+        echo ""
+        echo "❌ Generated SKILL.md files are stale."
+        echo "   Run: bun run gen:skill-docs"
+        echo "   Then commit the updated SKILL.md files."
+        exit 1
+      fi
+    - echo "✅ All SKILL.md files are up to date."
+  only:
+    - merge_requests
+    - main

@@ -6,6 +6,7 @@
  *   - Command validation (valid/invalid/snapshot errors)
  *   - Template coverage (which SKILL.md files have .tmpl sources)
  *   - Freshness check (generated files match committed files)
+ *   - Metadata coverage (name/team/bu/workflow in generated telemetry)
  */
 
 import { validateSkill } from '../test/helpers/skill-parser';
@@ -15,25 +16,44 @@ import { execSync } from 'child_process';
 
 const ROOT = path.resolve(import.meta.dir, '..');
 
-// Find all SKILL.md files
-const SKILL_FILES = [
-  'SKILL.md',
-  'browse/SKILL.md',
-  'qa/SKILL.md',
-  'qa-only/SKILL.md',
-  'ship/SKILL.md',
-  'review/SKILL.md',
-  'retro/SKILL.md',
-  'plan-ceo-review/SKILL.md',
-  'plan-eng-review/SKILL.md',
-  'setup-browser-cookies/SKILL.md',
-  'plan-design-review/SKILL.md',
-  'design-review/SKILL.md',
-  'antidev-upgrade/SKILL.md',
-  'document-release/SKILL.md',
-].filter(f => fs.existsSync(path.join(ROOT, f)));
+interface SkillFilePair {
+  dir: string;
+  generated: string;
+  template: string;
+}
 
+function discoverSkillPairs(): SkillFilePair[] {
+  const out: SkillFilePair[] = [];
+  const skipDirs = new Set(['.git', 'node_modules', '.claude', '.antidev']);
+
+  const rootGenerated = path.join(ROOT, 'SKILL.md');
+  const rootTemplate = path.join(ROOT, 'SKILL.md.tmpl');
+  if (fs.existsSync(rootGenerated) || fs.existsSync(rootTemplate)) {
+    out.push({ dir: '.', generated: 'SKILL.md', template: 'SKILL.md.tmpl' });
+  }
+
+  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (!entry.isDirectory() || skipDirs.has(entry.name)) continue;
+    const generated = path.join(ROOT, entry.name, 'SKILL.md');
+    const template = path.join(ROOT, entry.name, 'SKILL.md.tmpl');
+    if (fs.existsSync(generated) || fs.existsSync(template)) {
+      out.push({
+        dir: entry.name,
+        generated: path.join(entry.name, 'SKILL.md'),
+        template: path.join(entry.name, 'SKILL.md.tmpl'),
+      });
+    }
+  }
+
+  return out.sort((a, b) => a.generated.localeCompare(b.generated));
+}
+
+const SKILL_PAIRS = discoverSkillPairs();
+const SKILL_FILES = SKILL_PAIRS.map(p => p.generated).filter(f => fs.existsSync(path.join(ROOT, f)));
 let hasErrors = false;
+let hasWarnings = false;
+let metadataChecked = 0;
+let metadataMissing = 0;
 
 // ─── Skills ─────────────────────────────────────────────────
 
@@ -43,7 +63,8 @@ for (const file of SKILL_FILES) {
   const result = validateSkill(fullPath);
 
   if (result.warnings.length > 0) {
-    console.log(`  \u26a0\ufe0f  ${file.padEnd(30)} — ${result.warnings.join(', ')}`);
+    hasWarnings = true;
+    console.log(`  ⚠️  ${file.padEnd(30)} — ${result.warnings.join(', ')}`);
     continue;
   }
 
@@ -53,7 +74,7 @@ for (const file of SKILL_FILES) {
 
   if (totalInvalid > 0 || totalSnapErrors > 0) {
     hasErrors = true;
-    console.log(`  \u274c ${file.padEnd(30)} — ${totalValid} valid, ${totalInvalid} invalid, ${totalSnapErrors} snapshot errors`);
+    console.log(`  ❌ ${file.padEnd(30)} — ${totalValid} valid, ${totalInvalid} invalid, ${totalSnapErrors} snapshot errors`);
     for (const inv of result.invalid) {
       console.log(`      line ${inv.line}: unknown command '${inv.command}'`);
     }
@@ -61,38 +82,64 @@ for (const file of SKILL_FILES) {
       console.log(`      line ${se.command.line}: ${se.error}`);
     }
   } else {
-    console.log(`  \u2705 ${file.padEnd(30)} — ${totalValid} commands, all valid`);
+    console.log(`  ✅ ${file.padEnd(30)} — ${totalValid} commands, all valid`);
   }
 }
 
 // ─── Templates ──────────────────────────────────────────────
 
 console.log('\n  Templates:');
-const TEMPLATES = [
-  { tmpl: 'SKILL.md.tmpl', output: 'SKILL.md' },
-  { tmpl: 'browse/SKILL.md.tmpl', output: 'browse/SKILL.md' },
-];
+for (const pair of SKILL_PAIRS) {
+  const tmplPath = path.join(ROOT, pair.template);
+  const outPath = path.join(ROOT, pair.generated);
+  const hasTemplate = fs.existsSync(tmplPath);
+  const hasGenerated = fs.existsSync(outPath);
 
-for (const { tmpl, output } of TEMPLATES) {
-  const tmplPath = path.join(ROOT, tmpl);
-  const outPath = path.join(ROOT, output);
-  if (!fs.existsSync(tmplPath)) {
-    console.log(`  \u26a0\ufe0f  ${output.padEnd(30)} — no template`);
+  if (!hasTemplate && !hasGenerated) {
     continue;
   }
-  if (!fs.existsSync(outPath)) {
+
+  if (hasTemplate && !hasGenerated) {
     hasErrors = true;
-    console.log(`  \u274c ${output.padEnd(30)} — generated file missing! Run: bun run gen:skill-docs`);
+    console.log(`  ❌ ${pair.generated.padEnd(30)} — generated file missing! Run: bun run gen:skill-docs`);
     continue;
   }
-  console.log(`  \u2705 ${tmpl.padEnd(30)} \u2192 ${output}`);
+
+  if (!hasTemplate && hasGenerated) {
+    hasWarnings = true;
+    console.log(`  ⚠️  ${pair.generated.padEnd(30)} — no template (.tmpl) found`);
+    continue;
+  }
+
+  console.log(`  ✅ ${pair.template.padEnd(30)} → ${pair.generated}`);
 }
 
-// Skills without templates
+// ─── Metadata ──────────────────────────────────────────────
+
+console.log('\n  Metadata:');
 for (const file of SKILL_FILES) {
-  const tmplPath = path.join(ROOT, file + '.tmpl');
-  if (!fs.existsSync(tmplPath) && !TEMPLATES.some(t => t.output === file)) {
-    console.log(`  \u26a0\ufe0f  ${file.padEnd(30)} — no template (OK if no $B commands)`);
+  const fullPath = path.join(ROOT, file);
+  const content = fs.readFileSync(fullPath, 'utf-8');
+  const hasTelemetry = content.includes('skill-usage.jsonl');
+  if (!hasTelemetry) continue;
+
+  const usesStandardPreamble = content.includes('## Preamble (run first)');
+  if (!usesStandardPreamble) {
+    console.log(`  ℹ️  ${file.padEnd(30)} — custom telemetry block (metadata optional)`);
+    continue;
+  }
+
+  metadataChecked++;
+  const hasTeam = content.includes('"team":"');
+  const hasBu = content.includes('"bu":"');
+  const hasWorkflow = content.includes('"workflow":"');
+
+  if (!hasTeam || !hasBu || !hasWorkflow) {
+    metadataMissing++;
+    hasWarnings = true;
+    console.log(`  ⚠️  ${file.padEnd(30)} — telemetry metadata missing (team/bu/workflow)`);
+  } else {
+    console.log(`  ✅ ${file.padEnd(30)} — telemetry metadata present`);
   }
 }
 
@@ -112,5 +159,11 @@ try {
   console.log('      Run: bun run gen:skill-docs');
 }
 
+console.log('');
+console.log('  Summary:');
+console.log(`  - Skills discovered: ${SKILL_PAIRS.length}`);
+console.log(`  - Generated skills checked: ${SKILL_FILES.length}`);
+console.log(`  - Telemetry metadata checks: ${metadataChecked} (${metadataMissing} missing)`);
+console.log(`  - Status: ${hasErrors ? 'ERROR' : (hasWarnings ? 'WARN' : 'OK')}`);
 console.log('');
 process.exit(hasErrors ? 1 : 0);

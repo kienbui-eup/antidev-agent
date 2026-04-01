@@ -1,4 +1,16 @@
-# antidev development
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Quick Start
+
+```bash
+git clone <repo> && cd antidev
+bun install                    # install dependencies
+bin/dev-setup                  # activate dev mode (symlinks skills to working tree)
+```
+
+When done developing: `bin/dev-teardown` to restore global install.
 
 ## Commands
 
@@ -41,6 +53,9 @@ bun run test:evals   # run before shipping — paid, diff-based (~$4/run max)
 integration tests. `bun run test:evals` runs LLM-judge quality evals and E2E
 tests via `claude -p`. Both must pass before creating a PR.
 
+**Setup for evals:** Copy `.env.example` to `.env` and add `ANTHROPIC_API_KEY`.
+Bun auto-loads it. CI runs `bun run gen:skill-docs --dry-run` to catch stale docs.
+
 ## Project structure
 
 ```
@@ -78,6 +93,21 @@ antidev/
 ├── SKILL.md.tmpl    # Template: edit this, run gen:skill-docs
 └── package.json     # Build scripts for browse
 ```
+
+## Key architecture concepts
+
+**Daemon model:** Browse runs a persistent Chromium via `Bun.serve()`. First call
+starts server (~3s), subsequent calls are ~100ms HTTP POST. State file at
+`.antidev/browse.json` tracks PID, port, bearer token. Auto-restarts on binary
+version mismatch.
+
+**Ref system:** `snapshot -i` generates refs like `@e1`, `@e2` from the ARIA
+accessibility tree. Refs map to Playwright Locators, not DOM modifications. This
+avoids CSP issues and framework hydration conflicts. Refs invalidate on navigation.
+
+**Stale ref detection:** Before using any ref, `resolveRef()` runs a quick
+`locator.count()` check. If element no longer exists, fails fast with helpful
+error instead of 30s Playwright timeout.
 
 ## SKILL.md workflow
 
@@ -125,6 +155,18 @@ When you need to interact with a browser (QA, dogfooding, cookie setup), use the
 `/browse` skill or run the browse binary directly via `$B <command>`. NEVER use
 `mcp__claude-in-chrome__*` tools — they are slow, unreliable, and not what this
 project uses.
+
+## Contributor mode
+
+Enable contributor mode to auto-generate field reports when antidev behaves suboptimally:
+
+```bash
+~/.claude/skills/antidev/bin/antidev-config set antidev_contributor true
+```
+
+Claude Code will rate each major workflow step 0-10 and file reports to
+`~/.antidev/contributor-logs/` when something doesn't hit 10. Reports include
+what happened, repro steps, and suggested improvements.
 
 ## Vendored symlink awareness
 

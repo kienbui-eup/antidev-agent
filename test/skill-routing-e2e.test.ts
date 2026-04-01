@@ -46,21 +46,19 @@ if (evalsEnabled && !process.env.EVALS_ALL) {
 
 /** Copy all SKILL.md files into tmpDir/.claude/skills/antidev/ for auto-discovery */
 function installSkills(tmpDir: string) {
-  const skillDirs = [
-    '', // root antidev SKILL.md
-    'qa', 'qa-only', 'ship', 'review', 'plan-ceo-review', 'plan-eng-review',
-    'plan-design-review', 'design-review', 'design-consultation', 'retro',
-    'document-release', 'investigate', 'office-hours', 'browse', 'setup-browser-cookies',
-    'antidev-upgrade', 'humanizer',
-  ];
+  const rootSkill = path.join(ROOT, 'SKILL.md');
+  if (fs.existsSync(rootSkill)) {
+    const destDir = path.join(tmpDir, '.claude', 'skills', 'antidev');
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(rootSkill, path.join(destDir, 'SKILL.md'));
+  }
 
-  for (const skill of skillDirs) {
-    const srcPath = path.join(ROOT, skill, 'SKILL.md');
+  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const srcPath = path.join(ROOT, entry.name, 'SKILL.md');
     if (!fs.existsSync(srcPath)) continue;
 
-    const destDir = skill
-      ? path.join(tmpDir, '.claude', 'skills', 'antidev', skill)
-      : path.join(tmpDir, '.claude', 'skills', 'antidev');
+    const destDir = path.join(tmpDir, '.claude', 'skills', 'antidev', entry.name);
     fs.mkdirSync(destDir, { recursive: true });
     fs.copyFileSync(srcPath, path.join(destDir, 'SKILL.md'));
   }

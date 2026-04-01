@@ -195,6 +195,19 @@ describe('formatReport', () => {
     expect(report).toContain('Safety Hook Events');
     expect(report).toContain('By Repo');
   });
+
+  test('shows organization view when BU/team metadata exists', () => {
+    const events: AnalyticsEvent[] = [
+      { skill: 'qa', ts: '2026-03-18T15:30:00Z', repo: 'app', bu: 'engineering', team: 'quality', workflow: 'qa' },
+      { skill: 'review', ts: '2026-03-18T16:00:00Z', repo: 'app', bu: 'engineering', team: 'engineering', workflow: 'delivery' },
+      { skill: 'design-review', ts: '2026-03-18T16:30:00Z', repo: 'app', bu: 'product', team: 'design', workflow: 'design' },
+    ];
+    const report = formatReport(events);
+    expect(report).toContain('Organization View');
+    expect(report).toContain('BU: engineering(2) product(1)');
+    expect(report).toContain('Team:');
+    expect(report).toContain('Workflow:');
+  });
 });
 
 describe('integration via runScript helper', () => {

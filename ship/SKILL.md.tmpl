@@ -364,11 +364,11 @@ Save the review output — it goes into the PR body in Step 8.
 
 ---
 
-## Step 3.75: Address Greptile review comments (if PR exists)
+## Step 3.75: Address Greptile review comments (if MR/PR exists)
 
 Read `.claude/skills/review/greptile-triage.md` and follow the fetch, filter, classify, and **escalation detection** steps.
 
-**If no PR exists, `gh` fails, API returns an error, or there are zero Greptile comments:** Skip this step silently. Continue to Step 4.
+**If no MR/PR exists, `glab`/`gh` fails, API returns an error, or there are zero Greptile comments:** Skip this step silently. Continue to Step 4.
 
 **If Greptile comments are found:**
 
@@ -607,10 +607,57 @@ git push -u origin <branch-name>
 
 ---
 
-## Step 8: Create PR
+## Step 8: Create MR/PR
 
-Create a pull request using `gh`:
+Detect VCS and create a merge request (GitLab) or pull request (GitHub):
 
+```bash
+# Detect VCS provider
+if command -v glab &>/dev/null && git remote get-url origin 2>/dev/null | grep -q 'gitlab'; then
+  VCS=gitlab
+else
+  VCS=github
+fi
+```
+
+**For GitLab** (VCS=gitlab):
+```bash
+glab mr create --base <base> --title "<type>: <summary>" --description "$(cat <<'EOF'
+## Summary
+<bullet points from CHANGELOG>
+
+## Test Coverage
+<coverage diagram from Step 3.4, or "All new code paths have test coverage.">
+<If Step 3.4 ran: "Tests: {before} → {after} (+{delta} new)">
+
+## Pre-Landing Review
+<findings from Step 3.5 code review, or "No issues found.">
+
+## Design Review
+<If design review ran: "Design Review (lite): N findings — M auto-fixed, K skipped. AI Slop: clean/N issues.">
+<If no frontend files changed: "No frontend files changed — design review skipped.">
+
+## Eval Results
+<If evals ran: suite names, pass/fail counts, cost dashboard summary. If skipped: "No prompt-related files changed — evals skipped.">
+
+## TODOS
+<If items marked complete: bullet list of completed items with version>
+<If no items completed: "No TODO items completed in this MR.">
+<If TODOS.md created or reorganized: note that>
+<If TODOS.md doesn't exist and user skipped: omit this section>
+
+## Test plan
+- [x] All tests pass
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)"
+
+MR_URL=$(glab mr view --json web_url -q .web_url 2>/dev/null || true)
+echo "MR_URL=${MR_URL:-unknown}"
+```
+
+**For GitHub** (VCS=github):
 ```bash
 gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
 ## Summary
@@ -648,9 +695,63 @@ gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
+
+MR_URL=$(gh pr view --json url -q .url 2>/dev/null || true)
+echo "MR_URL=${MR_URL:-unknown}"
 ```
 
-**Output the PR URL** — then proceed to Step 8.5.
+**Output the MR/PR URL** — then proceed to Step 8.3.
+
+---
+
+## Step 8.3: Jira ticket transition (auto)
+
+Auto-link and transition the Jira ticket associated with this branch, if any.
+
+```bash
+BRANCH=$(git branch --show-current)
+JIRA_TICKET=$(echo "$BRANCH" | grep -oE '[A-Z]+-[0-9]+' | head -1 || true)
+echo "JIRA_TICKET=${JIRA_TICKET:-none}"
+```
+
+If `JIRA_TICKET` is not empty AND `JIRA_HOST` is set in the environment:
+1. Add a comment linking the MR/PR: `bun run scripts/jira.ts comment --issue $JIRA_TICKET --text "MR/PR created: ${MR_URL:-unknown}"`
+2. Transition to "In Review": `bun run scripts/jira.ts transition --issue $JIRA_TICKET --to "In Review"`
+3. Output: `Jira: $JIRA_TICKET → In Review`
+
+If either command fails (ticket not found, transition unavailable): warn and continue. Never stop the ship workflow for a Jira failure.
+
+If no ticket found or `JIRA_HOST` is unset: skip silently.
+
+---
+
+## Step 8.4: Jira done transition (post-merge)
+
+If `JIRA_TICKET` is not empty AND `JIRA_HOST` is set, check whether MR/PR is already merged.
+
+```bash
+if [ -n "${JIRA_TICKET:-}" ] && [ -n "${JIRA_HOST:-}" ]; then
+   if [ "${VCS:-}" = "gitlab" ]; then
+      MERGED_AT=$(glab mr view --json merged_at -q .merged_at 2>/dev/null || true)
+      if [ -n "$MERGED_AT" ] && [ "$MERGED_AT" != "null" ]; then
+         bun run scripts/jira.ts transition --issue "$JIRA_TICKET" --to "Done" || true
+         echo "Jira: $JIRA_TICKET → Done"
+      else
+         echo "Jira: $JIRA_TICKET remains In Review (MR not merged yet)"
+      fi
+   else
+      PR_MERGED=$(gh pr view --json merged -q .merged 2>/dev/null || true)
+      if [ "$PR_MERGED" = "true" ]; then
+         bun run scripts/jira.ts transition --issue "$JIRA_TICKET" --to "Done" || true
+         echo "Jira: $JIRA_TICKET → Done"
+      else
+         echo "Jira: $JIRA_TICKET remains In Review (PR not merged yet)"
+      fi
+   fi
+fi
+```
+
+Never stop the ship workflow if this step fails.
 
 ---
 

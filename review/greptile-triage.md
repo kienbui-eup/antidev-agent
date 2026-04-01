@@ -1,27 +1,39 @@
 # Greptile Comment Triage
 
-Shared reference for fetching, filtering, and classifying Greptile review comments on GitHub PRs. Both `/review` (Step 2.5) and `/ship` (Step 3.75) reference this document.
+Shared reference for fetching, filtering, and classifying Greptile review comments on GitLab MRs or GitHub PRs. Both `/review` (Step 2.5) and `/ship` (Step 3.75) reference this document.
 
 ---
 
 ## Fetch
 
-Run these commands to detect the PR and fetch comments. Both API calls run in parallel.
+Detect the VCS provider and MR/PR number, then fetch comments.
 
 ```bash
-REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null)
-PR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null)
+# Detect GitLab or GitHub and get MR/PR number
+if command -v glab &>/dev/null && glab mr view --output json &>/dev/null; then
+  VCS=gitlab
+  MR_NUMBER=$(glab mr view --output json 2>/dev/null | jq -r '.iid // empty')
+  REPO=$(git remote get-url origin 2>/dev/null | sed 's|.*[:/]\([^/]*/[^/]*\)\.git$|\1|' || true)
+else
+  VCS=github
+  REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null)
+  MR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null)
+fi
+PR_NUMBER=$MR_NUMBER
 ```
 
-**If either fails or is empty:** Skip Greptile triage silently. This integration is additive — the workflow works without it.
+**If VCS detection fails or MR/PR number is empty:** Skip Greptile triage silently. This integration is additive — the workflow works without it.
 
 ```bash
-# Fetch line-level review comments AND top-level PR comments in parallel
+# GitHub: Fetch line-level review comments AND top-level PR comments in parallel
+# (GitLab: Greptile is GitHub-native — skip silently if on GitLab)
+if [ "$VCS" = "github" ]; then
 gh api repos/$REPO/pulls/$PR_NUMBER/comments \
   --jq '.[] | select(.user.login == "greptile-apps[bot]") | select(.position != null) | {id: .id, path: .path, line: .line, body: .body, html_url: .html_url, source: "line-level"}' > /tmp/greptile_line.json &
 gh api repos/$REPO/issues/$PR_NUMBER/comments \
   --jq '.[] | select(.user.login == "greptile-apps[bot]") | {id: .id, body: .body, html_url: .html_url, source: "top-level"}' > /tmp/greptile_top.json &
 wait
+fi
 ```
 
 **If API errors or zero Greptile comments across both endpoints:** Skip silently.
@@ -75,7 +87,9 @@ For each non-suppressed comment:
 
 ## Reply APIs
 
-When replying to Greptile comments, use the correct endpoint based on comment source:
+When replying to Greptile comments, use the correct endpoint based on VCS and comment source.
+
+**GitHub only** (Greptile is GitHub-native; skip reply steps on GitLab):
 
 **Line-level comments** (from `pulls/$PR/comments`):
 ```bash

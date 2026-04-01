@@ -19,6 +19,9 @@ export interface AnalyticsEvent {
   skill: string;
   ts: string;
   repo: string;
+  team?: string;
+  bu?: string;
+  workflow?: string;
   event?: string;
   pattern?: string;
 }
@@ -119,6 +122,45 @@ export function formatReport(events: AnalyticsEvent[], period: string = 'all'): 
         .sort((a, b) => b[1] - a[1])
         .map(([s, c]) => `${s}(${c})`);
       lines.push(`  ${repo}: ${parts.join(' ')}`);
+    }
+  }
+
+  // By Team/BU (new standardized metadata)
+  const teamCounts = new Map<string, number>();
+  const buCounts = new Map<string, number>();
+  const workflowCounts = new Map<string, number>();
+  for (const e of skillEvents) {
+    if (e.team) teamCounts.set(e.team, (teamCounts.get(e.team) || 0) + 1);
+    if (e.bu) buCounts.set(e.bu, (buCounts.get(e.bu) || 0) + 1);
+    if (e.workflow) workflowCounts.set(e.workflow, (workflowCounts.get(e.workflow) || 0) + 1);
+  }
+
+  if (teamCounts.size > 0 || buCounts.size > 0 || workflowCounts.size > 0) {
+    lines.push('');
+    lines.push('Organization View');
+
+    if (buCounts.size > 0) {
+      const buText = [...buCounts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([bu, count]) => `${bu}(${count})`)
+        .join(' ');
+      lines.push(`  BU: ${buText}`);
+    }
+
+    if (teamCounts.size > 0) {
+      const teamText = [...teamCounts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([team, count]) => `${team}(${count})`)
+        .join(' ');
+      lines.push(`  Team: ${teamText}`);
+    }
+
+    if (workflowCounts.size > 0) {
+      const workflowText = [...workflowCounts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([wf, count]) => `${wf}(${count})`)
+        .join(' ');
+      lines.push(`  Workflow: ${workflowText}`);
     }
   }
 

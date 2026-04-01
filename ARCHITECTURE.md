@@ -1,6 +1,19 @@
 # Kiến trúc
 
-Tài liệu này giải thích **lý do** antidev được xây dựng theo cách này. Để biết cách cài đặt và các lệnh, xem CLAUDE.md. Để biết cách đóng góp, xem CONTRIBUTING.md.
+Tài liệu này giải thích **lý do** `antidev` được xây dựng theo cách này. Để biết cách cài đặt và các lệnh, xem `CLAUDE.md`. Để biết cách đóng góp, xem `CONTRIBUTING.md`.
+
+## Mục lục
+- [Ý tưởng cốt lõi](#ý-tưởng-cốt-lõi)
+- [Tại sao dùng Bun](#tại-sao-dùng-bun)
+- [Mô hình daemon](#mô-hình-daemon)
+- [Mô hình bảo mật](#mô-hình-bảo-mật)
+- [Hệ thống ref](#hệ-thống-ref)
+- [Kiến trúc logging](#kiến-trúc-logging)
+- [Hệ thống template SKILL.md](#hệ-thống-template-skillmd)
+- [Điều phối lệnh](#điều-phối-lệnh)
+- [Triết lý xử lý lỗi](#triết-lý-xử-lý-lỗi)
+- [Cơ sở hạ tầng kiểm tra E2E](#cơ-sở-hạ-tầng-kiểm-tra-e2e)
+- [Những gì cố ý không có ở đây](#những-gì-cố-ý-không-có-ở-đây)
 
 ## Ý tưởng cốt lõi
 

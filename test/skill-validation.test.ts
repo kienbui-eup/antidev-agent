@@ -568,8 +568,8 @@ describe('office-hours skill structure', () => {
 
   // Original structural assertions
   for (const section of ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5', 'Phase 6',
-                          'Design Doc', 'Supersedes', 'APPROVED', 'Premise Challenge',
-                          'Alternatives', 'Smart-skip']) {
+    'Design Doc', 'Supersedes', 'APPROVED', 'Premise Challenge',
+    'Alternatives', 'Smart-skip']) {
     test(`contains ${section}`, () => expect(content).toContain(section));
   }
 
@@ -585,7 +585,7 @@ describe('office-hours skill structure', () => {
 
   // Six forcing questions (startup mode)
   for (const question of ['Demand Reality', 'Status Quo', 'Desperate Specificity',
-                           'Narrowest Wedge', 'Observation & Surprise', 'Future-Fit']) {
+    'Narrowest Wedge', 'Observation & Surprise', 'Future-Fit']) {
     test(`contains forcing question: ${question}`, () => expect(content).toContain(question));
   }
 
@@ -600,9 +600,9 @@ describe('office-hours skill structure', () => {
     expect(content).toContain('Intrapreneurship');
   });
 
-  // YC founder discovery engine
-  test('contains YC apply CTA with ref tracking', () => {
-    expect(content).toContain('ycombinator.com/apply?ref=antidev');
+  // Founder handoff CTA should be present even if outbound links evolve.
+  test('contains founder handoff CTA', () => {
+    expect(content).toContain('Do you want to keep iterating on this design, or are you ready to start building?');
   });
 
   test('contains "What I noticed" design doc section', () => {
@@ -649,7 +649,7 @@ describe('office-hours skill structure', () => {
 describe('investigate skill structure', () => {
   const content = fs.readFileSync(path.join(ROOT, 'investigate', 'SKILL.md'), 'utf-8');
   for (const section of ['Iron Law', 'Root Cause', 'Pattern Analysis', 'Hypothesis',
-                          'DEBUG REPORT', '3-strike', 'BLOCKED']) {
+    'DEBUG REPORT', '3-strike', 'BLOCKED']) {
     test(`contains ${section}`, () => expect(content).toContain(section));
   }
 });

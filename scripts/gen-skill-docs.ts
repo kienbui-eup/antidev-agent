@@ -11,6 +11,7 @@
 
 import { COMMAND_DESCRIPTIONS } from '../browse/src/commands';
 import { SNAPSHOT_FLAGS } from '../browse/src/snapshot';
+import { resolveSkillAnalyticsMeta } from './skill-taxonomy';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -102,6 +103,7 @@ function generateSnapshotFlags(_ctx: TemplateContext): string {
 }
 
 function generatePreamble(ctx: TemplateContext): string {
+  const meta = resolveSkillAnalyticsMeta(ctx.skillName);
   return `## Preamble (run first)
 
 \`\`\`bash
@@ -125,7 +127,7 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: \${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.antidev/analytics
-echo '{"skill":"${ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.antidev/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"${ctx.skillName}","team":"${meta.team}","bu":"${meta.bu}","workflow":"${meta.workflow}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.antidev/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.antidev/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/antidev/bin/antidev-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 \`\`\`
 
@@ -1237,34 +1239,27 @@ function processTemplate(tmplPath: string): { outputPath: string; content: strin
 
 function findTemplates(): string[] {
   const templates: string[] = [];
-  const candidates = [
-    path.join(ROOT, 'SKILL.md.tmpl'),
-    path.join(ROOT, 'browse', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'qa', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'qa-only', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'setup-browser-cookies', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'ship', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'review', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'plan-ceo-review', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'plan-eng-review', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'retro', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'office-hours', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'investigate', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'antidev-upgrade', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'plan-design-review', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'design-review', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'design-consultation', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'document-release', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'codex', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'careful', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'freeze', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'guard', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'unfreeze', 'SKILL.md.tmpl'),
-  ];
-  for (const p of candidates) {
-    if (fs.existsSync(p)) templates.push(p);
+  const skipDirs = new Set(['.git', 'node_modules', '.claude', '.antidev']);
+
+  function walk(dir: string): void {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isSymbolicLink()) continue;
+
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (skipDirs.has(entry.name)) continue;
+        walk(fullPath);
+        continue;
+      }
+
+      if (entry.isFile() && entry.name === 'SKILL.md.tmpl') {
+        templates.push(fullPath);
+      }
+    }
   }
-  return templates;
+
+  walk(ROOT);
+  return templates.sort((a, b) => a.localeCompare(b));
 }
 
 let hasChanges = false;

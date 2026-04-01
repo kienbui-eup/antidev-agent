@@ -1,6 +1,12 @@
 # Trình duyệt — chi tiết kỹ thuật
 
-Tài liệu này bao gồm tham khảo lệnh và nội bộ của trình duyệt headless của antidev.
+Tài liệu này bao gồm tham khảo lệnh và nội bộ của trình duyệt headless của `antidev`.
+
+## Mục lục
+- [Tham khảo lệnh](#tham-khảo-lệnh)
+- [Cách hoạt động](#cách-hoạt-động)
+- [Lời cảm ơn](#lời-cảm-ơn)
+- [Phát triển](#phát-triển)
 
 ## Tham khảo lệnh
 

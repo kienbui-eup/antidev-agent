@@ -6,6 +6,16 @@ import * as path from 'path';
 
 const ROOT = path.resolve(import.meta.dir, '..');
 
+function discoverSkillDirs(): string[] {
+  const dirs = ['.'];
+  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const tmplPath = path.join(ROOT, entry.name, 'SKILL.md.tmpl');
+    if (fs.existsSync(tmplPath)) dirs.push(entry.name);
+  }
+  return dirs;
+}
+
 describe('gen-skill-docs', () => {
   test('generated SKILL.md contains all command categories', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
@@ -56,39 +66,18 @@ describe('gen-skill-docs', () => {
     }
   });
 
-  // All skills that must have templates — single source of truth
-  const ALL_SKILLS = [
-    { dir: '.', name: 'root antidev' },
-    { dir: 'browse', name: 'browse' },
-    { dir: 'qa', name: 'qa' },
-    { dir: 'qa-only', name: 'qa-only' },
-    { dir: 'review', name: 'review' },
-    { dir: 'ship', name: 'ship' },
-    { dir: 'plan-ceo-review', name: 'plan-ceo-review' },
-    { dir: 'plan-eng-review', name: 'plan-eng-review' },
-    { dir: 'retro', name: 'retro' },
-    { dir: 'setup-browser-cookies', name: 'setup-browser-cookies' },
-    { dir: 'antidev-upgrade', name: 'antidev-upgrade' },
-    { dir: 'plan-design-review', name: 'plan-design-review' },
-    { dir: 'design-review', name: 'design-review' },
-    { dir: 'design-consultation', name: 'design-consultation' },
-    { dir: 'document-release', name: 'document-release' },
-    { dir: 'careful', name: 'careful' },
-    { dir: 'freeze', name: 'freeze' },
-    { dir: 'guard', name: 'guard' },
-    { dir: 'unfreeze', name: 'unfreeze' },
-  ];
+  const ALL_SKILL_DIRS = discoverSkillDirs();
 
   test('every skill has a SKILL.md.tmpl template', () => {
-    for (const skill of ALL_SKILLS) {
-      const tmplPath = path.join(ROOT, skill.dir, 'SKILL.md.tmpl');
+    for (const skillDir of ALL_SKILL_DIRS) {
+      const tmplPath = path.join(ROOT, skillDir, 'SKILL.md.tmpl');
       expect(fs.existsSync(tmplPath)).toBe(true);
     }
   });
 
   test('every skill has a generated SKILL.md with auto-generated header', () => {
-    for (const skill of ALL_SKILLS) {
-      const mdPath = path.join(ROOT, skill.dir, 'SKILL.md');
+    for (const skillDir of ALL_SKILL_DIRS) {
+      const mdPath = path.join(ROOT, skillDir, 'SKILL.md');
       expect(fs.existsSync(mdPath)).toBe(true);
       const content = fs.readFileSync(mdPath, 'utf-8');
       expect(content).toContain('AUTO-GENERATED from SKILL.md.tmpl');
@@ -97,8 +86,8 @@ describe('gen-skill-docs', () => {
   });
 
   test('every generated SKILL.md has valid YAML frontmatter', () => {
-    for (const skill of ALL_SKILLS) {
-      const content = fs.readFileSync(path.join(ROOT, skill.dir, 'SKILL.md'), 'utf-8');
+    for (const skillDir of ALL_SKILL_DIRS) {
+      const content = fs.readFileSync(path.join(ROOT, skillDir, 'SKILL.md'), 'utf-8');
       expect(content.startsWith('---\n')).toBe(true);
       expect(content).toContain('name:');
       expect(content).toContain('description:');
@@ -114,16 +103,16 @@ describe('gen-skill-docs', () => {
     expect(result.exitCode).toBe(0);
     const output = result.stdout.toString();
     // Every skill should be FRESH
-    for (const skill of ALL_SKILLS) {
-      const file = skill.dir === '.' ? 'SKILL.md' : `${skill.dir}/SKILL.md`;
+    for (const skillDir of ALL_SKILL_DIRS) {
+      const file = skillDir === '.' ? 'SKILL.md' : `${skillDir}/SKILL.md`;
       expect(output).toContain(`FRESH: ${file}`);
     }
     expect(output).not.toContain('STALE');
   });
 
   test('no generated SKILL.md contains unresolved placeholders', () => {
-    for (const skill of ALL_SKILLS) {
-      const content = fs.readFileSync(path.join(ROOT, skill.dir, 'SKILL.md'), 'utf-8');
+    for (const skillDir of ALL_SKILL_DIRS) {
+      const content = fs.readFileSync(path.join(ROOT, skillDir, 'SKILL.md'), 'utf-8');
       const unresolved = content.match(/\{\{[A-Z_]+\}\}/g);
       expect(unresolved).toBeNull();
     }
@@ -183,6 +172,16 @@ describe('gen-skill-docs', () => {
     for (const skill of PREAMBLE_SKILLS) {
       const content = fs.readFileSync(path.join(ROOT, skill.dir, 'SKILL.md'), 'utf-8');
       expect(content).toContain(`"skill":"${skill.name}"`);
+    }
+  });
+
+  test('preamble-using skills include standardized telemetry metadata', () => {
+    const PREAMBLE_SKILLS = ['SKILL.md', 'ship/SKILL.md', 'review/SKILL.md', 'qa/SKILL.md', 'retro/SKILL.md'];
+    for (const skillPath of PREAMBLE_SKILLS) {
+      const content = fs.readFileSync(path.join(ROOT, skillPath), 'utf-8');
+      expect(content).toContain('"team":"');
+      expect(content).toContain('"bu":"');
+      expect(content).toContain('"workflow":"');
     }
   });
 

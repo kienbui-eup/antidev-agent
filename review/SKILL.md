@@ -41,7 +41,7 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.antidev/analytics
-echo '{"skill":"review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.antidev/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"review","team":"engineering","bu":"engineering","workflow":"delivery","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.antidev/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.antidev/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/antidev/bin/antidev-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
@@ -236,11 +236,29 @@ You are running the `/review` workflow. Analyze the current branch's diff agains
 
 ---
 
+## Step 1.2: Jira ticket detection (auto)
+
+Extract a Jira ticket ID from the current branch name, if present.
+
+```bash
+BRANCH=$(git branch --show-current)
+JIRA_TICKET=$(echo "$BRANCH" | grep -oE '[A-Z]+-[0-9]+' | head -1 || true)
+echo "JIRA_TICKET=${JIRA_TICKET:-none}"
+```
+
+If `JIRA_TICKET` is not empty AND `JIRA_HOST` is set in the environment:
+- Add a comment to the ticket: `bun run scripts/jira.ts comment --issue $JIRA_TICKET --text "Code review started on branch \`$BRANCH\`"`
+- Output: `Jira: linked to $JIRA_TICKET`
+
+If no ticket found or `JIRA_HOST` is unset: skip silently. Jira integration is optional.
+
+---
+
 ## Step 1.5: Scope Drift Detection
 
 Before reviewing code quality, check: **did they build what was requested — nothing more, nothing less?**
 
-1. Read `TODOS.md` (if it exists). Read PR description (`gh pr view --json body --jq .body 2>/dev/null || true`).
+1. Read `TODOS.md` (if it exists). Read MR/PR description (`glab mr view --output json 2>/dev/null | jq -r '.description // ""' || gh pr view --json body --jq .body 2>/dev/null || true`).
    Read commit messages (`git log origin/<base>..HEAD --oneline`).
    **If no PR exists:** rely on commit messages and TODOS.md for stated intent — this is the common case since /review runs before /ship creates the PR.
 2. Identify the **stated intent** — what was this branch supposed to accomplish?
@@ -282,7 +300,7 @@ Read `.claude/skills/review/checklist.md`.
 
 Read `.claude/skills/review/greptile-triage.md` and follow the fetch, filter, classify, and **escalation detection** steps.
 
-**If no PR exists, `gh` fails, API returns an error, or there are zero Greptile comments:** Skip this step silently. Greptile integration is additive — the review works without it.
+**If no MR/PR exists, `glab`/`gh` fails, API returns an error, or there are zero Greptile comments:** Skip this step silently. Greptile integration is additive — the review works without it.
 
 **If Greptile comments are found:** Store the classifications (VALID & ACTIONABLE, VALID BUT ALREADY FIXED, FALSE POSITIVE, SUPPRESSED) — you will need them in Step 5.
 

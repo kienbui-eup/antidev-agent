@@ -1,8 +1,16 @@
 {
   "name": "antidev",
   "version": "0.3.3",
-  "description": "antidev — eUp Group's AI engineering toolkit. Claude Code skills + fast headless browser. Built by Kien Bui, CTO of eUp Group.",
+  "description": "antidev — eUp Group's AI engineering toolkit. Claude Code skills + fast headless browser. Built by eUp Group for eUp Group.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/eup/antidev-agent.git"
+  },
+  "homepage": "https://gitlab.com/eup/antidev-agent",
+  "bugs": {
+    "url": "https://gitlab.com/eup/antidev-agent/-/issues"
+  },
   "type": "module",
   "bin": {
     "browse": "./browse/dist/browse"
@@ -10,6 +18,7 @@
   "scripts": {
     "build": "bun run gen:skill-docs && bun build --compile browse/src/cli.ts --outfile browse/dist/browse && bun build --compile browse/src/find-browse.ts --outfile browse/dist/find-browse && git rev-parse HEAD > browse/dist/.version && rm -f .*.bun-build || true",
     "gen:skill-docs": "bun run scripts/gen-skill-docs.ts",
+    "jira": "bun run scripts/jira.ts",
     "dev": "bun run browse/src/cli.ts",
     "server": "bun run browse/src/server.ts",
     "test": "bun test browse/test/ test/ --ignore test/skill-e2e.test.ts --ignore test/skill-llm-eval.test.ts --ignore test/skill-routing-e2e.test.ts",
@@ -18,6 +27,7 @@
     "test:e2e": "EVALS=1 bun test test/skill-e2e.test.ts test/skill-routing-e2e.test.ts",
     "test:e2e:all": "EVALS=1 EVALS_ALL=1 bun test test/skill-e2e.test.ts test/skill-routing-e2e.test.ts",
     "skill:check": "bun run scripts/skill-check.ts",
+    "skill:health": "bun run scripts/skill-check.ts",
     "dev:skill": "bun run scripts/dev-skill.ts",
     "start": "bun run browse/src/server.ts",
     "eval:list": "bun run scripts/eval-list.ts",
@@ -25,7 +35,11 @@
     "eval:summary": "bun run scripts/eval-summary.ts",
     "eval:watch": "bun run scripts/eval-watch.ts",
     "eval:select": "bun run scripts/eval-select.ts",
-    "analytics": "bun run scripts/analytics.ts"
+    "analytics": "bun run scripts/analytics.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md,yml,yaml}\""
   },
   "dependencies": {
     "playwright": "^1.58.2",
@@ -47,6 +61,10 @@
     "antidev"
   ],
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.78.0"
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@eslint/js": "^9.24.0",
+    "eslint": "^9.24.0",
+    "prettier": "^3.5.3",
+    "typescript-eslint": "^8.29.0"
   }
 }

@@ -1,6 +1,18 @@
 # Đóng góp cho antidev
 
-Cảm ơn bạn đã muốn cải thiện antidev. Dù bạn đang sửa lỗi đánh máy trong skill prompt hay xây dựng một quy trình hoàn toàn mới, hướng dẫn này sẽ giúp bạn bắt đầu nhanh chóng.
+Cảm ơn bạn đã muốn cải thiện `antidev`. Dù bạn đang sửa lỗi đánh máy trong skill prompt hay xây dựng một quy trình hoàn toàn mới, hướng dẫn này sẽ giúp bạn bắt đầu nhanh chóng.
+
+## Mục lục
+- [Bắt đầu nhanh](#bắt-đầu-nhanh)
+- [Chế độ contributor](#chế-độ-contributor)
+- [Làm việc trên antidev trong repo antidev](#làm-việc-trên-antidev-trong-repo-antidev)
+- [Quy trình hàng ngày](#quy-trình-hàng-ngày)
+- [Testing & eval](#testing--eval)
+- [Chỉnh sửa file SKILL.md](#chỉnh-sửa-file-skillmd)
+- [Conductor workspace](#conductor-workspace)
+- [Những điều cần biết](#những-điều-cần-biết)
+- [Testing các thay đổi của bạn trong dự án thực](#testing-các-thay-đổi-của-bạn-trong-dự-án-thực)
+- [Ship các thay đổi của bạn](#ship-các-thay-đổi-của-bạn)
 
 ## Bắt đầu nhanh
 

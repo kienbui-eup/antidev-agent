@@ -1,0 +1,122 @@
+---
+name: super-lang-flow
+version: 1.0.0
+description: |
+  Learning path management for Hanzii, Mazii, and HeyLearning products.
+  Manages content pipeline, lesson sequencing, curriculum dependencies, and learner
+  progress tracking across all language learning apps.
+  Proactively suggest when content, curriculum, or learner data changes are being made.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+{{PREAMBLE}}
+
+# /super-lang-flow
+
+End-to-end learning path orchestration for eUp's language learning suite.
+Coordinates content production, curriculum design, and progress analytics.
+
+## Products
+
+| Product    | Languages     | Format                     |
+|------------|---------------|----------------------------|
+| Hanzii     | Chinese       | Flashcards, HSK paths      |
+| Mazii      | Japanese      | JLPT paths, kanji practice |
+| HeyLearning| 15+ languages | Adaptive learning paths    |
+
+## Step 1 — Identify scope
+
+Determine which product(s) and learning path(s) are affected:
+
+```bash
+# List changed curriculum files
+git diff --name-only HEAD~1 | grep -E '(curriculum|lessons|flashcards|paths)/'
+```
+
+Answer: Are you modifying content, structure, or learner-facing features?
+
+## Step 2 — Content pipeline
+
+For new or updated lessons:
+
+**2a. Validate content structure**
+Every lesson must have:
+- `id` — unique slug (e.g. `hsk2-lesson-04`, `jlpt-n3-kanji-001`)
+- `level` — curriculum level (beginner/elementary/intermediate/advanced/proficiency)
+- `language` — target language (ISO 639-1 code: zh, ja, ko, vi, en, ...)
+- `type` — lesson type: flashcard | reading | listening | grammar | exercise
+- `dependencies` — array of prerequisite lesson IDs (can be empty)
+
+**2b. Check sequencing**
+Dependencies must form a DAG (no cycles). Quick check:
+
+```bash
+# If lessons are JSON files, check for dependency cycles
+node -e "
+  const fs = require('fs');
+  const lessons = fs.readdirSync('./curriculum')
+    .filter(f => f.endsWith('.json'))
+    .map(f => JSON.parse(fs.readFileSync('./curriculum/' + f, 'utf8')));
+  const ids = new Set(lessons.map(l => l.id));
+  for (const l of lessons) {
+    for (const dep of (l.dependencies || [])) {
+      if (!ids.has(dep)) {
+        console.error('Missing dependency:', dep, 'required by', l.id);
+        process.exit(1);
+      }
+    }
+  }
+  console.log('Dependency graph OK');
+"
+```
+
+## Step 3 — Localization check
+
+Every learner-facing string must be available in all supported locales.
+Check against `eup.config.ts → i18n.supportedLanguages`.
+
+1. Run `bun run i18n:validate` to check coverage.
+2. For new strings, add to `i18n/en.json` first, then request translations.
+3. Mark untranslated strings with `[TODO: translate]` prefix — never ship bare English to non-English markets.
+
+## Step 4 — Progress tracking
+
+Verify analytics events are emitted for:
+- `lesson_started` — when learner begins a lesson
+- `lesson_completed` — when learner finishes with score
+- `lesson_skipped` — when learner skips
+- `path_completed` — when all lessons in a path are done
+
+Check event schema matches what the analytics pipeline expects:
+```bash
+grep -rn 'lesson_started\|lesson_completed\|path_completed' src/ --include='*.ts'
+```
+
+## Step 5 — QA handoff
+
+Before merging curriculum/content changes:
+
+1. Run `/content-qa` on the diff.
+2. Confirm lesson IDs don't conflict with production database.
+3. Test with at least one learner account per affected language.
+4. Update `CHANGELOG.md` with content additions.
+
+Create a Jira story for tracking:
+```bash
+# Title: "[SuperLangFlow] <path-name> — <language> content update"
+# Link to: content PR + QA results + translation tickets
+```
+
+## Step 6 — Release
+
+Tag curriculum releases separately from code releases:
+
+```bash
+git tag -a "curriculum/v$(date +%Y.%m.%d)" -m "Curriculum update: <summary>"
+git push origin --tags
+```
+
+Update learner-facing release notes in the app's "What's New" section.

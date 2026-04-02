@@ -1,0 +1,29 @@
+{
+  "skill.content-qa.name": "kiểm-tra-nội-dung",
+  "skill.content-qa.description": "Kiểm tra QA nội dung giáo dục: ảnh chụp màn hình, chất lượng dịch thuật, khả năng truy cập, và tính nhất quán UX.",
+  "skill.super-lang-flow.name": "luồng-học-ngôn-ngữ",
+  "skill.super-lang-flow.description": "Quản lý lộ trình học cho Hanzii, Mazii và HeyLearning: pipeline nội dung, sắp xếp bài học, theo dõi tiến độ.",
+  "skill.localization-workflow.name": "quy-trình-bản-địa-hóa",
+  "skill.localization-workflow.description": "Quy trình bản địa hóa đầu cuối cho 15+ ngôn ngữ: quản lý dịch thuật, chu kỳ review, áp dụng bảng thuật ngữ.",
+
+  "step.setup": "Thiết lập",
+  "step.overview": "Tổng quan",
+  "step.workflow": "Quy trình",
+  "step.review": "Xem xét",
+  "step.output": "Kết quả",
+  "step.done": "Hoàn thành",
+
+  "label.status": "Trạng thái",
+  "label.passed": "Đạt",
+  "label.failed": "Không đạt",
+  "label.skipped": "Bỏ qua",
+  "label.pending": "Đang chờ",
+  "label.blockers": "Vấn đề cản trở",
+  "label.warnings": "Cảnh báo",
+
+  "common.loading": "Đang tải...",
+  "common.success": "Thành công",
+  "common.error": "Lỗi",
+  "common.noIssuesFound": "Không tìm thấy vấn đề nào.",
+  "common.seeDetails": "Xem chi tiết bên dưới."
+}

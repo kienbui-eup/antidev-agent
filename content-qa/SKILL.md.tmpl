@@ -1,0 +1,142 @@
+---
+name: content-qa
+version: 1.0.0
+description: |
+  QA review for educational content: screenshots, translation quality, accessibility,
+  and UX consistency across Hanzii, Mazii, and HeyLearning products.
+  Proactively suggest when a feature involves user-facing text, images, or UI changes.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - WebFetch
+  - AskUserQuestion
+---
+{{PREAMBLE}}
+
+# /content-qa
+
+Multi-language educational platform quality assurance. Validates content accuracy,
+translation quality, accessibility standards, and visual consistency.
+
+## When to use
+
+Invoke `/content-qa` when:
+- New lesson content, flashcard decks, or exercises are added
+- UI strings are changed (menus, CTAs, error messages)
+- Screenshots or media assets are updated
+- A localization sprint is completing review
+- Pre-launch final QA on a new language market
+
+## Setup
+
+**Required env vars:**
+```
+ANTIDEV_LANG=vi       # output language for QA reports (default: en)
+JIRA_HOST             # to create QA tickets for blockers
+JIRA_PROJECT          # project key (e.g. EUP)
+```
+
+Check setup: `gitlab-config verify`
+
+## Step 1 — Scope
+
+Read the PR/MR diff or working tree changes. Identify:
+- Changed UI strings (`.json`, `.ts`, `.tsx`, `.vue`)
+- New or updated image assets (`*.png`, `*.jpg`, `*.svg`)
+- Skill or help text changes (`SKILL.md`, `README.md`)
+- Localization files (`i18n/`, `locales/`, `translations/`)
+
+```bash
+git diff --name-only HEAD~1 | grep -E '\.(json|ts|tsx|vue|png|jpg|svg|md)$'
+```
+
+## Step 2 — Translation Quality Check
+
+For each modified i18n file:
+
+1. Check key coverage — every key in `en.json` must exist in all locale files.
+2. Check for untranslated placeholders — no English strings left in non-English locales.
+3. Check interpolation variables — `{name}`, `{count}` etc must match exactly.
+
+```bash
+# Check key coverage
+node -e "
+  const en = require('./i18n/en.json');
+  const vi = require('./i18n/vi.json');
+  const missing = Object.keys(en).filter(k => !(k in vi));
+  if (missing.length) { console.error('Missing in vi:', missing); process.exit(1); }
+  console.log('vi: all keys present');
+"
+```
+
+## Step 3 — Content Accuracy
+
+For educational content (flashcards, lessons, exercises):
+
+1. **Word/character correctness** — CJK characters (Hanzii/Mazii), diacritics (Vietnamese), script accuracy.
+2. **Audio/image pairing** — If an asset references a word/character, confirm alignment.
+3. **Difficulty grading** — Beginner → Advanced progression is consistent.
+4. **Cultural appropriateness** — Examples and imagery are suitable for the target locale.
+
+If content needs human review, create a Jira ticket:
+```bash
+JIRA_HOST="${JIRA_HOST:-https://eup-group.atlassian.net}"
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+  "${JIRA_HOST}/rest/api/3/issue" \
+  -d '{"fields":{"project":{"key":"EUP"},"summary":"[Content QA] Review needed: <file>","issuetype":{"name":"Task"}}}'
+```
+
+## Step 4 — Accessibility
+
+1. Images must have descriptive `alt` text (not filenames).
+2. Color contrast: foreground/background must meet WCAG AA (4.5:1 for body text).
+3. Interactive elements have focus states.
+4. Screen reader order matches visual order.
+
+Note accessibility blockers with severity: **Critical** (WCAG A) vs **Warning** (WCAG AA).
+
+## Step 5 — Visual Consistency
+
+1. Font families match brand guidelines (`Noto Sans`, `Noto Serif CJK` for CJK content).
+2. Spacing, padding, and component sizes follow design system tokens.
+3. Icons and illustrations are from the approved asset library.
+4. Dark mode variant exists where required.
+
+Use browse for visual verification if a staging URL is available:
+```bash
+$B screenshot <staging-url> --selector .lesson-card
+```
+
+## Step 6 — QA Report
+
+Output a structured report:
+
+```
+## Content QA Report — <date>
+
+### Scope
+- Files reviewed: N
+- Languages: vi, en, zh-CN, ...
+
+### Results
+| Check              | Status  | Notes                     |
+|--------------------|---------|---------------------------|
+| Key coverage       | ✅ Pass |                           |
+| Untranslated text  | ⚠️ Warn | 3 strings in ko.json      |
+| Accessibility      | ✅ Pass |                           |
+| Visual consistency | ✅ Pass |                           |
+
+### Blockers (must fix before merge)
+- [ ] <issue>
+
+### Warnings (fix before release)
+- [ ] <issue>
+
+### Jira tickets created
+- EUP-XXX: <summary>
+```
+
+If blockers exist, **do not approve the MR**. Comment on the MR/PR with the report.

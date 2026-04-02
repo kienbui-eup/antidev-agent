@@ -19,6 +19,8 @@
     "build": "bun run gen:skill-docs && bun build --compile browse/src/cli.ts --outfile browse/dist/browse && bun build --compile browse/src/find-browse.ts --outfile browse/dist/find-browse && git rev-parse HEAD > browse/dist/.version && rm -f .*.bun-build || true",
     "gen:skill-docs": "bun run scripts/gen-skill-docs.ts",
     "jira": "bun run scripts/jira.ts",
+    "i18n:validate": "bun run scripts/i18n-validate.ts",
+    "i18n:extract": "bun run scripts/i18n-extract.ts",
     "dev": "bun run browse/src/cli.ts",
     "server": "bun run browse/src/server.ts",
     "test": "bun test browse/test/ test/ --ignore test/skill-e2e.test.ts --ignore test/skill-llm-eval.test.ts --ignore test/skill-routing-e2e.test.ts",

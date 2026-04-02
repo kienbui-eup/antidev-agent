@@ -1,0 +1,133 @@
+---
+name: localization-workflow
+version: 1.0.0
+description: |
+  End-to-end localization management for eUp products across 15+ languages.
+  Coordinates translation memory, glossaries, review cycles, and delivery.
+  Proactively suggest when new UI strings are added or a new language market is being targeted.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - AskUserQuestion
+---
+{{PREAMBLE}}
+
+# /localization-workflow
+
+Full localization lifecycle for eUp's 15+ language markets.
+From string extraction to translator handoff to QA sign-off to production release.
+
+## Supported Languages
+
+| Code  | Language            | Market           |
+|-------|---------------------|------------------|
+| vi    | Vietnamese          | Primary (VN)     |
+| en    | English             | Global default   |
+| zh-CN | Simplified Chinese  | China/SG         |
+| zh-TW | Traditional Chinese | TW/HK            |
+| ja    | Japanese            | Japan            |
+| ko    | Korean              | Korea            |
+| th    | Thai                | Thailand         |
+| id    | Indonesian          | Indonesia        |
+| ms    | Malay               | Malaysia         |
+| fr    | French              | France           |
+| de    | German              | Germany          |
+| es    | Spanish             | LatAm + Spain    |
+| pt    | Portuguese          | Brazil + PT      |
+| it    | Italian             | Italy            |
+| ru    | Russian             | Russia           |
+
+## Step 1 — String extraction
+
+Extract new/changed translatable strings from the codebase:
+
+```bash
+bun run i18n:extract
+```
+
+This updates `i18n/en.json` with:
+- New keys from source code (`t('key')`, `$t('key')`)
+- Removed keys (marked as deprecated, not deleted — translators need to see them)
+- Changed source strings (marks all locale translations as `[REVIEW NEEDED]`)
+
+## Step 2 — Validate before handoff
+
+```bash
+bun run i18n:validate
+```
+
+Checks:
+1. All keys in `en.json` exist in all locale files (no missing translations)
+2. No interpolation variable mismatches (`{name}` must appear in all locales)
+3. No untranslated `[TODO: translate]` markers in production-targeted locales
+4. Glossary terms are used consistently (e.g., "flashcard" not "flash card")
+
+Fix all errors before sending to translators. Warnings can go with annotations.
+
+## Step 3 — Translator handoff
+
+Create a translation package:
+
+```bash
+# Export only changed/new strings for each locale
+bun run i18n:export --changed --format=xliff --output=./translation-packages/v$(date +%Y%m%d)
+```
+
+XLIFF format is required for CAT tool compatibility (Phrase, Lokalise, Transifex).
+
+Handoff checklist:
+- [ ] Context screenshots attached (from `/content-qa` run)
+- [ ] Glossary PDF included (`docs/eup-glossary-<lang>.pdf`)
+- [ ] Character limits flagged for UI strings (especially button text: max 20-30 chars)
+- [ ] Tone guide included (formal vs informal, brand voice per market)
+- [ ] Deadline in Jira ticket
+
+## Step 4 — Review cycle
+
+When translations are returned:
+
+1. **Import** translations: `bun run i18n:import --file=<xliff-file>`
+2. **Validate** again: `bun run i18n:validate`
+3. **In-context review** — run `/content-qa` with the new locale active:
+   ```bash
+   ANTIDEV_LANG=<locale> bun run dev qa
+   ```
+4. **Native speaker sign-off** — each locale needs sign-off from a native speaker
+   on the eUp localization team before shipping.
+
+Track reviews in Jira:
+- Story: `[L10N] <locale> — <release/sprint> translation review`
+- Subtasks per: Import → Validate → In-context → Native review → Approved
+
+## Step 5 — Glossary management
+
+The eUp glossary ensures consistency across translators and products.
+
+**Key terms (do not localize the key, only the value):**
+
+| Term (EN)      | VI                  | ZH-CN       | JA         |
+|----------------|---------------------|-------------|------------|
+| flashcard      | thẻ ghi nhớ         | 闪卡        | フラッシュカード |
+| learning path  | lộ trình học        | 学习路径    | 学習パス   |
+| lesson         | bài học             | 课程        | レッスン   |
+| streak         | chuỗi ngày liên tiếp| 连续天数    | ストリーク |
+| review         | ôn tập              | 复习        | 復習       |
+| quiz           | bài kiểm tra nhỏ   | 小测验      | クイズ     |
+
+Update `docs/eup-glossary.json` when new terms are added.
+```bash
+# Detect glossary violations in translations
+bun run i18n:validate --check-glossary
+```
+
+## Step 6 — Release
+
+1. Final `bun run i18n:validate` — must be 0 errors.
+2. Update `CHANGELOG.md` with new locale additions or major string updates.
+3. Tag the localization release:
+   ```bash
+   git tag -a "l10n/v$(date +%Y.%m.%d)" -m "Localization: <locales> — <summary>"
+   ```
+4. Notify locale-specific support teams of changes (via Slack #localization channel).
+5. Monitor error rates in production for 48h after locale rollouts.

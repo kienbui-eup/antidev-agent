@@ -1,0 +1,29 @@
+{
+  "skill.content-qa.name": "content-qa",
+  "skill.content-qa.description": "QA review for educational content: screenshots, translation quality, accessibility, and UX consistency.",
+  "skill.super-lang-flow.name": "super-lang-flow",
+  "skill.super-lang-flow.description": "Manage learning paths for Hanzii, Mazii, and HeyLearning: content pipeline, lesson sequencing, and progress tracking.",
+  "skill.localization-workflow.name": "localization-workflow",
+  "skill.localization-workflow.description": "End-to-end localization workflow for 15+ languages: translation management, review cycles, glossary enforcement.",
+
+  "step.setup": "Setup",
+  "step.overview": "Overview",
+  "step.workflow": "Workflow",
+  "step.review": "Review",
+  "step.output": "Output",
+  "step.done": "Done",
+
+  "label.status": "Status",
+  "label.passed": "Passed",
+  "label.failed": "Failed",
+  "label.skipped": "Skipped",
+  "label.pending": "Pending",
+  "label.blockers": "Blockers",
+  "label.warnings": "Warnings",
+
+  "common.loading": "Loading...",
+  "common.success": "Success",
+  "common.error": "Error",
+  "common.noIssuesFound": "No issues found.",
+  "common.seeDetails": "See details below."
+}

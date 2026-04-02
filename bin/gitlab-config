@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+# gitlab-config — interactive setup helper for eUp GitLab integration.
+#
+# Usage:
+#   gitlab-config setup    — interactive wizard: set GITLAB_TOKEN, JIRA_HOST, etc.
+#   gitlab-config verify   — check all required tokens are working
+#   gitlab-config show     — print current config (redact secrets)
+#
+# Env overrides (for testing):
+#   ANTIDEV_STATE_DIR  — override ~/.antidev state directory
+set -euo pipefail
+
+ANTIDEV_DIR="${ANTIDEV_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+STATE_DIR="${ANTIDEV_STATE_DIR:-$HOME/.antidev}"
+CONFIG_FILE="$STATE_DIR/config.yaml"
+ENV_FILE="${ANTIDEV_DIR}/.env"
+
+_config_set() { "$ANTIDEV_DIR/bin/antidev-config" set "$1" "$2"; }
+_config_get() { "$ANTIDEV_DIR/bin/antidev-config" get "$1" 2>/dev/null || true; }
+
+_read_secret() {
+  local prompt="$1"
+  local var
+  read -rsp "$prompt: " var </dev/tty
+  echo ""
+  echo "$var"
+}
+
+_write_env() {
+  local key="$1"
+  local value="$2"
+  mkdir -p "$(dirname "$ENV_FILE")"
+  touch "$ENV_FILE"
+  if grep -qE "^${key}=" "$ENV_FILE" 2>/dev/null; then
+    sed -i '' "s|^${key}=.*|${key}=${value}|" "$ENV_FILE"
+  else
+    echo "${key}=${value}" >> "$ENV_FILE"
+  fi
+}
+
+cmd_setup() {
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo " antidev × eUp GitLab Setup"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+
+  # GitLab
+  echo "── GitLab ──────────────────────────────"
+  echo "  Create a Personal Access Token at:"
+  echo "  https://gitlab.com/-/user_settings/personal_access_tokens"
+  echo "  Scopes needed: api, read_user, read_repository"
+  echo ""
+  GITLAB_TOKEN=$(_read_secret "GitLab Personal Access Token")
+  if [ -n "$GITLAB_TOKEN" ]; then
+    _write_env "GITLAB_TOKEN" "$GITLAB_TOKEN"
+    echo "  ✅ GITLAB_TOKEN saved to .env"
+  fi
+
+  GITLAB_HOST="${GITLAB_HOST:-https://gitlab.com}"
+  read -rp "GitLab host [${GITLAB_HOST}]: " input </dev/tty
+  GITLAB_HOST="${input:-$GITLAB_HOST}"
+  _config_set "gitlab_host" "$GITLAB_HOST"
+  echo "  ✅ gitlab_host = $GITLAB_HOST"
+
+  GITLAB_GROUP="${GITLAB_GROUP:-eup}"
+  read -rp "GitLab group/namespace [${GITLAB_GROUP}]: " input </dev/tty
+  GITLAB_GROUP="${input:-$GITLAB_GROUP}"
+  _config_set "gitlab_group" "$GITLAB_GROUP"
+  echo "  ✅ gitlab_group = $GITLAB_GROUP"
+  echo ""
+
+  # Jira
+  echo "── Jira ────────────────────────────────"
+  echo "  Create an API Token at:"
+  echo "  https://id.atlassian.com/manage-profile/security/api-tokens"
+  echo ""
+  read -rp "Jira host [https://eup-group.atlassian.net]: " JIRA_HOST </dev/tty
+  JIRA_HOST="${JIRA_HOST:-https://eup-group.atlassian.net}"
+  _write_env "JIRA_HOST" "$JIRA_HOST"
+
+  read -rp "Jira email: " JIRA_EMAIL </dev/tty
+  [ -n "$JIRA_EMAIL" ] && _write_env "JIRA_EMAIL" "$JIRA_EMAIL"
+
+  JIRA_TOKEN=$(_read_secret "Jira API Token")
+  [ -n "$JIRA_TOKEN" ] && _write_env "JIRA_API_TOKEN" "$JIRA_TOKEN"
+
+  read -rp "Jira default project key [EUP]: " JIRA_PROJECT </dev/tty
+  JIRA_PROJECT="${JIRA_PROJECT:-EUP}"
+  _write_env "JIRA_PROJECT" "$JIRA_PROJECT"
+  echo "  ✅ Jira config saved to .env"
+  echo ""
+
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo " Setup complete! Run: gitlab-config verify"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+}
+
+cmd_verify() {
+  echo "── Verifying GitLab connection ─────────"
+  local token
+  token=$(grep -E '^GITLAB_TOKEN=' "$ENV_FILE" 2>/dev/null | cut -d= -f2 | tr -d '"' || true)
+  if [ -z "$token" ]; then
+    echo "  ❌ GITLAB_TOKEN not set. Run: gitlab-config setup"
+    exit 1
+  fi
+  local host
+  host=$(_config_get "gitlab_host")
+  host="${host:-https://gitlab.com}"
+  if curl -sf -H "PRIVATE-TOKEN: $token" "${host}/api/v4/user" >/dev/null 2>&1; then
+    echo "  ✅ GitLab: authenticated (${host})"
+  else
+    echo "  ❌ GitLab: authentication failed (check GITLAB_TOKEN + host)"
+    exit 1
+  fi
+
+  echo "── Verifying Jira connection ───────────"
+  local jira_host jira_email jira_token
+  jira_host=$(grep -E '^JIRA_HOST=' "$ENV_FILE" 2>/dev/null | cut -d= -f2 | tr -d '"' || true)
+  jira_email=$(grep -E '^JIRA_EMAIL=' "$ENV_FILE" 2>/dev/null | cut -d= -f2 | tr -d '"' || true)
+  jira_token=$(grep -E '^JIRA_API_TOKEN=' "$ENV_FILE" 2>/dev/null | cut -d= -f2 | tr -d '"' || true)
+  if [ -z "$jira_host" ] || [ -z "$jira_email" ] || [ -z "$jira_token" ]; then
+    echo "  ⚠️  Jira not fully configured (optional). Run: gitlab-config setup"
+  elif curl -sf -u "${jira_email}:${jira_token}" "${jira_host}/rest/api/3/myself" >/dev/null 2>&1; then
+    echo "  ✅ Jira: authenticated (${jira_host})"
+  else
+    echo "  ❌ Jira: authentication failed (check JIRA_EMAIL + JIRA_API_TOKEN)"
+  fi
+
+  echo "── Done ────────────────────────────────"
+}
+
+cmd_show() {
+  echo "── Current config (.antidev/config.yaml) ─"
+  if [ -f "$CONFIG_FILE" ]; then
+    cat "$CONFIG_FILE"
+  else
+    echo "  (empty)"
+  fi
+  echo ""
+  echo "── Secrets (.env) ─────────────────────"
+  if [ -f "$ENV_FILE" ]; then
+    # Redact secret values
+    sed 's/\(TOKEN\|API_KEY\|PASSWORD\|SECRET\)=.*/\1=***/' "$ENV_FILE"
+  else
+    echo "  (no .env file)"
+  fi
+}
+
+case "${1:-}" in
+  setup)   cmd_setup ;;
+  verify)  cmd_verify ;;
+  show)    cmd_show ;;
+  *)
+    echo "Usage: gitlab-config {setup|verify|show}"
+    echo ""
+    echo "  setup   — interactive wizard to configure GitLab + Jira"
+    echo "  verify  — test current credentials against live APIs"
+    echo "  show    — print current config (secrets redacted)"
+    exit 1
+    ;;
+esac
